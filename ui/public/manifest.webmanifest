@@ -1,6 +1,6 @@
 {
-  "short_name": "Metis",
-  "name": "Metis for Testing, build with React + Vite + TypeScript and thanks for Vital.",
+  "short_name": "Auth Keeper",
+  "name": "Auth Keeper for Testing, build with React + Vite + TypeScript and thanks for Vital.",
   "icons": [
     {
       "src": "favicon.svg",

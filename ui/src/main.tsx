@@ -1,12 +1,18 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import {createRoot} from 'react-dom/client';
 import "./index.css";
 import App from "app/app";
 
-// mount to metis node
-ReactDOM.render(
+const akEl = document.getElementById("ak");
+if (akEl == null) {
+  throw new Error("Not found root node(#ak)!")
+}
+
+const root = createRoot(akEl);
+
+root.render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById("metis")
-);
+    <App/>
+  </React.StrictMode>
+)
+
