@@ -77,6 +77,18 @@ type BaseEntity[T any] struct {
 	deletedVal   string
 }
 
+type FS[T any] struct {
+	Name string
+	FFn  func(*T) any
+}
+
+func OfFS[T any](name string, fn func(*T) any) *FS[T] {
+	return &FS[T]{
+		Name: name,
+		FFn:  fn,
+	}
+}
+
 func (be *BaseEntity[T]) Insert(fss ...*FS[T]) *BaseEntity[T] {
 	be.inserts = fss
 	return be
