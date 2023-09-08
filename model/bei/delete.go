@@ -9,10 +9,10 @@ import (
 )
 
 type DeleteBuilder[T any] struct {
-	*BaseEntity[T]
+	*Evaluator[T]
 }
 
-func (t *BaseEntity[T]) Delete() *DeleteBuilder[T] {
+func (t *Evaluator[T]) Delete() *DeleteBuilder[T] {
 	return &DeleteBuilder[T]{t}
 }
 
@@ -26,19 +26,48 @@ func (t *DeleteBuilder[T]) Where(pd *Predicate) *DeleteBuilder[T] {
 	return t
 }
 
-func (t *DeleteBuilder[T]) Persist() *Persist[T] {
+func (t *DeleteBuilder[T]) WithSQLKey(key string) *DeleteBuilder[T] {
+	t.sqlKey = key
+	return t
+}
+
+func (t *DeleteBuilder[T]) WithLogicDeleted(cdv ...string) *DeleteBuilder[T] {
+	if !t.enableLogical() {
+		t.logical.Enable()
+	}
+	// using last value
+	for _, v := range cdv {
+		t.logical.cdval = v
+	}
+	return t
+}
+
+func (t *DeleteBuilder[T]) Eval(pss ...PersistService[T]) EvalInfoService[T] {
 	t.buf.Reset()
+	for _, ps := range pss {
+		if len(t.sqlKey) == 0 {
+			break
+		}
+		lookup := ps.Lookup(t.sqlKey)
+		if lookup != nil {
+			_, whereValues := t.getWhereSQL()
+			values := append([]any{}, whereValues...)
+			t.ei = OfEvalInfo[T](lookup.SQL(), "", values, nil)
+			return t.ei
+		}
+	}
 
 	var (
 		sql    string
 		values []any
 	)
 
-	if t.logicDeleted {
-		setSQL := t.deletedKey + " = " + t.deletedVal
-		fromSQL := t.getFromSQL()
-		whereSQL, whereValues := t.getWhereSQL()
-		logicDeletedSQL := t.getLogicDeletedSQL()
+	fromSQL := t.getFromSQL()
+	whereSQL, whereValues := t.getWhereSQL()
+	logicDeletedSQL := t.getLogicDeletedSQL()
+
+	if t.enableLogical() {
+		setSQL := t.logical.key + PrettyEqual + t.logical.ddval
 
 		t.buf.WriteString(keyword.Update.Literal())
 		t.write(fromSQL)
@@ -55,10 +84,6 @@ func (t *DeleteBuilder[T]) Persist() *Persist[T] {
 		sql = t.buf.String()
 		values = whereValues
 	} else {
-		fromSQL := t.getFromSQL()
-		whereSQL, whereValues := t.getWhereSQL()
-		logicDeletedSQL := t.getLogicDeletedSQL()
-
 		t.buf.WriteString(keyword.Delete.Literal())
 		t.write(fromSQL, keyword.From.Literal())
 		if len(logicDeletedSQL) > 0 {
@@ -74,5 +99,12 @@ func (t *DeleteBuilder[T]) Persist() *Persist[T] {
 		values = whereValues
 	}
 	t.values = values
-	return OfPersist[T](sql, "", values, nil)
+	t.ei = OfEvalInfo[T](sql, "", values, nil)
+	for _, ps := range pss {
+		if len(t.sqlKey) == 0 {
+			break
+		}
+		ps.Persistence(t.sqlKey, OfEvalInfo[T](sql, "", nil, nil))
+	}
+	return t.ei
 }

@@ -10,11 +10,11 @@ import (
 )
 
 type QueryBuilder[T any] struct {
-	*BaseEntity[T]
+	*Evaluator[T]
 }
 
-func (t *BaseEntity[T]) Select(fds ...*FD[T]) *QueryBuilder[T] {
-	t.fds = append(t.fds, fds...)
+func (t *Evaluator[T]) Select(fds ...*FD[T]) *QueryBuilder[T] {
+	t.fds = fds
 	return &QueryBuilder[T]{t}
 }
 
@@ -58,16 +58,38 @@ func (t *QueryBuilder[T]) Offset(ost int64) *QueryBuilder[T] {
 	return t
 }
 
+func (t *QueryBuilder[T]) WithSQLKey(key string) *QueryBuilder[T] {
+	t.sqlKey = key
+	return t
+}
+
 func (t *QueryBuilder[T]) WithLogicDeleted(cdv ...string) *QueryBuilder[T] {
-	t.logicDeleted = true
-	if len(cdv) == 1 {
-		t.currentDeletedVal = cdv[0]
+	if !t.enableLogical() {
+		t.logical.Enable()
+	}
+	// using last value
+	for _, v := range cdv {
+		t.logical.cdval = v
 	}
 	return t
 }
 
-func (t *QueryBuilder[T]) Persist() *Persist[T] {
+func (t *QueryBuilder[T]) Eval(pss ...PersistService[T]) EvalInfoService[T] {
 	t.buf.Reset()
+	for _, ps := range pss {
+		if len(t.sqlKey) == 0 {
+			break
+		}
+		lookup := ps.Lookup(t.sqlKey)
+		if lookup != nil {
+			_, whereValues := t.getWhereSQL()
+			_, havingValues := t.getHavingSQL()
+			values := append([]any{}, whereValues...)
+			values = append(values, havingValues...)
+			t.ei = OfEvalInfo(lookup.SQL(), lookup.TotalSQL(), values, lookup.Mappers())
+			return t.ei
+		}
+	}
 	if len(t.fds) == 0 {
 		panic("not found any column")
 	}
@@ -92,13 +114,13 @@ func (t *QueryBuilder[T]) Persist() *Persist[T] {
 
 	enablePage := len(pageSQL) > 0
 
-	var ts strings.Builder
+	ts := &strings.Builder{}
 	if enablePage {
 		ts.WriteString(keyword.Select.Literal())
 		ts.WriteString(Space)
 		ts.WriteString(keyword.Count.Literal())
 		ts.WriteString("(")
-		t.writeToBuf(&ts, hintSQL)
+		t.writeToBuf(ts, hintSQL)
 		ts.WriteString("1")
 		ts.WriteString(")")
 	}
@@ -106,16 +128,20 @@ func (t *QueryBuilder[T]) Persist() *Persist[T] {
 	t.buf.WriteString(keyword.Select.Literal())
 	t.write(hintSQL)
 	t.write(fieldSQL)
-	t.writeAppend(&ts, fromSQL, keyword.From.Literal())
+	t.writeAppend(ts, fromSQL, keyword.From.Literal())
 	if len(logicDeletedSQL) > 0 {
-		t.writeAppend(&ts, LeftParentheses+whereSQL+RightParentheses, keyword.Where.Literal())
-		t.writeAppend(&ts, keyword.And.Literal())
-		t.writeAppend(&ts, logicDeletedSQL)
+		if strings.Contains(whereSQL, keyword.And.Literal()) || strings.Contains(whereSQL, keyword.Or.Literal()) {
+			t.writeAppend(ts, LeftParentheses+whereSQL+RightParentheses, keyword.Where.Literal())
+		} else {
+			t.writeAppend(ts, whereSQL, keyword.Where.Literal())
+		}
+		t.writeAppend(ts, keyword.And.Literal())
+		t.writeAppend(ts, logicDeletedSQL)
 	} else {
-		t.writeAppend(&ts, whereSQL, keyword.Where.Literal())
+		t.writeAppend(ts, whereSQL, keyword.Where.Literal())
 	}
-	t.writeAppend(&ts, groupBySQL, keyword.Group.Literal(), keyword.By.Literal())
-	t.writeAppend(&ts, havingSQL, keyword.Having.Literal())
+	t.writeAppend(ts, groupBySQL, keyword.Group.Literal(), keyword.By.Literal())
+	t.writeAppend(ts, havingSQL, keyword.Having.Literal())
 	if len(pageSQL) > 0 {
 		ts.WriteString(";")
 		totalSQL = ts.String()
@@ -127,5 +153,12 @@ func (t *QueryBuilder[T]) Persist() *Persist[T] {
 	values = append(values, havingValues...)
 	t.values = values
 	execSQL = t.buf.String()
-	return OfPersist(execSQL, totalSQL, values, mappers)
+	t.ei = OfEvalInfo(execSQL, totalSQL, values, mappers)
+	for _, ps := range pss {
+		if len(t.sqlKey) == 0 {
+			break
+		}
+		ps.Persistence(t.sqlKey, OfEvalInfo(t.ei.SQL(), t.ei.TotalSQL(), nil, t.ei.Mappers()))
+	}
+	return t.ei
 }

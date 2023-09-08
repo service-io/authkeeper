@@ -14,14 +14,14 @@ type Order struct {
 	asc  bool
 }
 
-func (t *BaseEntity[T]) Desc(cols ...string) *Order {
+func (t *Evaluator[T]) Desc(cols ...string) *Order {
 	return &Order{
 		cols: cols,
 		asc:  false,
 	}
 }
 
-func (t *BaseEntity[T]) Asc(cols ...string) *Order {
+func (t *Evaluator[T]) Asc(cols ...string) *Order {
 	return &Order{
 		cols: cols,
 		asc:  true,

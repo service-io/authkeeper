@@ -28,7 +28,7 @@ func (k Keyword) Literal() string {
 		return ""
 	}
 	if uppercase {
-		return strings.ToUpper(string(k))
+		return string(k)
 	}
 	return strings.ToLower(string(k))
 }

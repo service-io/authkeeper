@@ -101,8 +101,8 @@ type InfoService[T any] interface {
 func (ag *autogen) GenInterfaceConfigService() jen.Code {
 	return jen.Id(`
 type ConfigService[T any] interface {
-  Configure(configFn func(entity *BaseEntity[T]))
-  BEI() *BaseEntity[T]
+  Configure(configFn func(entity *Evaluator[T]))
+  BEI() *Evaluator[T]
 }
 `)
 }
@@ -110,11 +110,11 @@ type ConfigService[T any] interface {
 func (ag *autogen) GenInterfaceOperateService() jen.Code {
 	return jen.Id(`
 type OperateService[T any] interface {
-  Insert(fss ...*FS[T]) *BaseEntity[T]
+  Insert(fss ...*FS[T]) *Evaluator[T]
   InsertFields() (fields []string, placeholders []string)
   InsertSql(times ...int) (string, []any)
 
-  Update(fss ...*FS[T]) *BaseEntity[T]
+  Update(fss ...*FS[T]) *Evaluator[T]
   UpdateFields() (fields []string)
   UpdateSql() (string, []any)
 
@@ -140,7 +140,7 @@ type OperateService[T any] interface {
 
 func (ag *autogen) GenStructBaseEntity() jen.Code {
 	return jen.Id(`
-type BaseEntity[T any] struct {
+type Evaluator[T any] struct {
   inserts      []*FS[T]
   updates      []*FS[T]
   selects      []*FS[T]

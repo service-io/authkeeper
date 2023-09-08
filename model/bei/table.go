@@ -21,7 +21,7 @@ func OfRef(name string) *RefTable {
 	return &RefTable{name: name}
 }
 
-func (t *BaseEntity[T]) OfRef(name string) *RefTable {
+func (t *Evaluator[T]) OfRef(name string) *RefTable {
 	return OfRef(name)
 }
 
@@ -42,9 +42,9 @@ func (j *JointType) String() string {
 	case Join:
 		return keyword.Join.Literal()
 	case LeftJoin:
-		return keyword.Left.Literal() + " " + keyword.Join.Literal()
+		return keyword.Left.Literal() + Space + keyword.Join.Literal()
 	case RightJoin:
-		return keyword.Right.Literal() + " " + keyword.Join.Literal()
+		return keyword.Right.Literal() + Space + keyword.Join.Literal()
 	default:
 		return ""
 	}
@@ -69,11 +69,11 @@ func (t *RefTable) JoinType(jt JointType) *RefTable {
 func (t *RefTable) On(a string, s Sym, b string) *RefTable {
 	var buf strings.Builder
 	buf.WriteString(keyword.On.String())
-	buf.WriteString(" ")
+	buf.WriteString(Space)
 	buf.WriteString(a)
-	buf.WriteString(" ")
+	buf.WriteString(Space)
 	buf.WriteString(s.Self())
-	buf.WriteString(" ")
+	buf.WriteString(Space)
 	buf.WriteString(b)
 	t.on = buf.String()
 	return t
@@ -90,7 +90,7 @@ func (t *RefTable) selfSQL() (sql string) {
 	if len(t.as) == 0 {
 		name = t.name
 	} else {
-		name = t.name + " " + keyword.As.String() + " " + t.as
+		name = t.name + Space + keyword.As.String() + Space + t.as
 	}
 	if len(t.jt.String()) > 0 {
 		bs = append(bs, t.jt.String())
@@ -99,7 +99,7 @@ func (t *RefTable) selfSQL() (sql string) {
 	if len(t.on) > 0 {
 		bs = append(bs, t.on)
 	}
-	return strings.Join(bs, " ")
+	return strings.Join(bs, Space)
 }
 
 func (t *RefTable) SQL() (sql string) {
@@ -112,12 +112,12 @@ func (t *RefTable) SQL() (sql string) {
 	var refs = make([]string, len(t.ref))
 	for i, table := range t.ref {
 		if i == 0 {
-			refs[i] = t.selfSQL() + " " + table.SQL()
+			refs[i] = t.selfSQL() + Space + table.SQL()
 			continue
 		}
 		refs[i] = table.SQL()
 	}
-	return strings.Join(refs, " ")
+	return strings.Join(refs, Space)
 }
 
 func (t *RefTable) FlatAll() (tables []*RefTable) {

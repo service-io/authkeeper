@@ -24,6 +24,7 @@ type Predicate struct {
 	sym Sym
 	rht *Predicate
 	ars []any
+	buf strings.Builder
 }
 
 func Once(f string, s Sym, ars ...any) *Predicate {
@@ -35,7 +36,7 @@ func Once(f string, s Sym, ars ...any) *Predicate {
 	}
 }
 
-func (t *BaseEntity[T]) Once(f string, s Sym, ars ...any) *Predicate {
+func (t *Evaluator[T]) Once(f string, s Sym, ars ...any) *Predicate {
 	return &Predicate{
 		mod: DftMode,
 		fid: f,
@@ -89,8 +90,13 @@ func (p *Predicate) SQL() (sql string, values []any) {
 	if p == nil {
 		return "", nil
 	}
+
 	if p.lft == nil {
-		sql = fmt.Sprintf("%s %s", p.fid, p.sym.Ph())
+		p.buf.Reset()
+		p.buf.WriteString(p.fid)
+		p.buf.WriteString(Space)
+		p.buf.WriteString(p.sym.Ph())
+		sql = p.buf.String()
 		values = append(values, p.ars...)
 		return
 	}
@@ -102,26 +108,46 @@ func (p *Predicate) SQL() (sql string, values []any) {
 	if p.rht.mod == DftMode {
 		p.rht.mod = p.mod
 	}
+	p.buf.Reset()
 	if p.mod == p.lft.mod {
 		if p.mod == p.rht.mod {
-			sql = fmt.Sprintf("%s %s %s", lftSQL, p.sym.Ph(), rhtSQL)
-			values = append(values, lftValues...)
-			values = append(values, rhtValues...)
+			p.buf.WriteString(lftSQL)
+			p.buf.WriteString(Space)
+			p.buf.WriteString(p.sym.Ph())
+			p.buf.WriteString(Space)
+			p.buf.WriteString(rhtSQL)
 		} else {
-			sql = fmt.Sprintf("%s %s (%s)", lftSQL, p.sym.Ph(), rhtSQL)
-			values = append(values, lftValues...)
-			values = append(values, rhtValues...)
+			p.buf.WriteString(lftSQL)
+			p.buf.WriteString(Space)
+			p.buf.WriteString(p.sym.Ph())
+			p.buf.WriteString(Space)
+			p.buf.WriteString(LeftParentheses)
+			p.buf.WriteString(rhtSQL)
+			p.buf.WriteString(RightParentheses)
 		}
 	} else {
 		if p.mod == p.rht.mod {
-			sql = fmt.Sprintf("(%s) %s %s", lftSQL, p.sym.Ph(), rhtSQL)
-			values = append(values, lftValues...)
-			values = append(values, rhtValues...)
+			p.buf.WriteString(LeftParentheses)
+			p.buf.WriteString(lftSQL)
+			p.buf.WriteString(RightParentheses)
+			p.buf.WriteString(Space)
+			p.buf.WriteString(p.sym.Ph())
+			p.buf.WriteString(Space)
+			p.buf.WriteString(rhtSQL)
 		} else {
-			sql = fmt.Sprintf("(%s) %s (%s)", lftSQL, p.sym.Ph(), rhtSQL)
-			values = append(values, lftValues...)
-			values = append(values, rhtValues...)
+			p.buf.WriteString(LeftParentheses)
+			p.buf.WriteString(lftSQL)
+			p.buf.WriteString(RightParentheses)
+			p.buf.WriteString(Space)
+			p.buf.WriteString(p.sym.Ph())
+			p.buf.WriteString(Space)
+			p.buf.WriteString(LeftParentheses)
+			p.buf.WriteString(rhtSQL)
+			p.buf.WriteString(RightParentheses)
 		}
 	}
+	sql = p.buf.String()
+	values = append(values, lftValues...)
+	values = append(values, rhtValues...)
 	return
 }

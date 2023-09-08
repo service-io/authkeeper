@@ -17,7 +17,7 @@ func (g *Group) SQL() string {
 	return strings.Join(g.cols, Space)
 }
 
-func (t *BaseEntity[T]) Group(cols ...string) *Group {
+func (t *Evaluator[T]) Group(cols ...string) *Group {
 	return &Group{
 		cols: cols,
 	}

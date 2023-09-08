@@ -9,18 +9,18 @@ import (
 )
 
 type UpdateBuilder[T any] struct {
-	*BaseEntity[T]
+	*Evaluator[T]
 }
 
-func (t *BaseEntity[T]) UpdateRef(ref *RefTable, fds ...*FD[T]) *UpdateBuilder[T] {
-	t.fds = append(t.fds, fds...)
+func (t *Evaluator[T]) UpdateRef(ref *RefTable, fds ...*FD[T]) *UpdateBuilder[T] {
+	t.fds = fds
 	t.ref = ref
 	return &UpdateBuilder[T]{t}
 }
 
-func (t *BaseEntity[T]) Update(ref *RefTable) *UpdateBuilder[T] {
+func (t *Evaluator[T]) Update(ref *RefTable) *UpdateBuilder[T] {
 	t.ref = ref
-	return &UpdateBuilder[T]{t}
+	return &UpdateBuilder[T]{Evaluator: t}
 }
 
 func (t *UpdateBuilder[T]) Set(fd *FD[T], v any) *UpdateBuilder[T] {
@@ -39,8 +39,36 @@ func (t *UpdateBuilder[T]) Where(pd *Predicate) *UpdateBuilder[T] {
 	return t
 }
 
-func (t *UpdateBuilder[T]) Persist() *Persist[T] {
+func (t *UpdateBuilder[T]) WithSQLKey(key string) *UpdateBuilder[T] {
+	t.sqlKey = key
+	return t
+}
+
+func (t *UpdateBuilder[T]) WithLogicDeleted(cdv ...string) *UpdateBuilder[T] {
+	if !t.enableLogical() {
+		t.logical.Enable()
+	}
+	// using last value
+	for _, v := range cdv {
+		t.logical.cdval = v
+	}
+	return t
+}
+
+func (t *UpdateBuilder[T]) Eval(pss ...PersistService[T]) EvalInfoService[T] {
 	t.buf.Reset()
+	for _, ps := range pss {
+		if len(t.sqlKey) == 0 {
+			break
+		}
+		lookup := ps.Lookup(t.sqlKey)
+		if lookup != nil {
+			_, whereValues := t.getWhereSQL()
+			values := append([]any{}, whereValues...)
+			t.ei = OfEvalInfo[T](lookup.SQL(), "", values, nil)
+			return t.ei
+		}
+	}
 	if len(t.fds) == 0 {
 		panic("not found any column.")
 	}
@@ -71,5 +99,12 @@ func (t *UpdateBuilder[T]) Persist() *Persist[T] {
 	values = append(t.values, whereValues...)
 	t.values = values
 
-	return OfPersist[T](sql, "", values, nil)
+	t.ei = OfEvalInfo[T](sql, "", values, nil)
+	for _, ps := range pss {
+		if len(t.sqlKey) == 0 {
+			break
+		}
+		ps.Persistence(t.sqlKey, OfEvalInfo[T](sql, "", nil, nil))
+	}
+	return t.ei
 }
