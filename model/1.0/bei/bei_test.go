@@ -6,7 +6,7 @@ package bei
 
 import (
 	"fmt"
-	"metis/model/bei/keyword"
+	"metis/model/1.0/bei/keyword"
 	"testing"
 	"time"
 )
@@ -154,9 +154,13 @@ func TestBEI_5(t *testing.T) {
 	persist := dft.Select(account.FName().Inject(acco)).From(user.Ref(acco)).
 		Where(
 			account.FName().Inject(acco).Eq("张三").
-				And(account.FAge().Inject(acco).Eq(33).
-					Or(account.FBirthday().Inject(acco).Eq("2023-10-10"),
-						dft.OfFD("year", nil).Inject(user).Eq("2023"))),
+				And(
+					account.FAge().Inject(acco).Eq(33).
+						Or(
+							account.FBirthday().Inject(acco).Eq("2023-10-10"),
+							dft.OfFD("year", nil).Inject(user).Eq("2023"),
+						),
+				),
 		).Limit(10).
 		GroupBy(dft.Group(account.FName().Fd())).OrderBy(dft.Asc("nk")).EvalInfo()
 
@@ -215,13 +219,32 @@ func BenchmarkPredicate_SQL(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		account := &Account{}
-		// dft := WithLogical[Account]()
-		and := account.FID().Eq(111000).And(account.FName().Like("tabuyos"), account.FAge().Ge(25)).Or(account.FName().Like("tabuyos"), account.FAge().Ge(25))
-		and.SQL()
-		// dft.Select(account.FName(), account.FAge(), account.FID(), account.FBirthday(), account.FGender()).
-		//   From(account.Table()).
-		//   // Where(and).
-		//   WithSQLKey("one").Eval()
+		Once("name", eqSym, "tabuyos").And(Once("age", eqSym, 23), Once("gender", eqSym, 1)).SQL()
+	}
+}
+
+func BenchmarkEvaluator_Eval(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	user := OfRef("user")
+	account := OfRef("account")
+	tenant := OfRef("tenant")
+	nc := OfFD[string]("name", nil)
+	ac := OfFD[string]("age", nil)
+	ic := OfFD[string]("id", nil)
+	for i := 0; i < b.N; i++ {
+		eval := &Evaluator[string]{}
+		and0 := Once(ac.Literal(), eqSym, "25")
+		and1 := Once(ic.Literal(), eqSym, "111000")
+		or0 := Once(ac.Literal(), eqSym, "25")
+		or1 := Once(ic.Literal(), eqSym, "111000")
+		predicate := Once(nc.Literal(), eqSym, "tabuyos").And(and0, and1).Or(or0, or1)
+		having := Once(ic.Literal(), eqSym, "111000")
+		account.JoinType(LeftJoin).On(nc.Literal(), eqSym, ic.Literal())
+		tenant.JoinType(LeftJoin).On(ic.Literal(), eqSym, ac.Literal())
+		user.Ref(account, tenant)
+		eval.Select(nc, ac, ic).Hint(keyword.Distinct).From(user).Where(predicate).GroupBy(eval.Group(nc.Fd(), ac.Fd())).
+			Having(having).OrderBy(eval.Asc(ac.Fd()), eval.Desc(nc.Fd())).Limit(20).Offset(0).Eval()
+		eval.Select(nc, ac, ic).Hint(keyword.Distinct).From(user).Where(predicate).Eval()
 	}
 }

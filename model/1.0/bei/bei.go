@@ -6,7 +6,7 @@ package bei
 
 import (
 	"fmt"
-	"metis/model/bei/keyword"
+	"metis/model/1.0/bei/keyword"
 	"strconv"
 	"strings"
 	"time"
@@ -163,7 +163,9 @@ func (t *Evaluator[T]) getOrderBySQL() string {
 func (t *Evaluator[T]) getPageSQL() string {
 	if t.limit > 0 {
 		if t.offset > 0 {
-			return keyword.Limit.Literal() + Space + strconv.FormatInt(t.limit, 10) + keyword.Offset.Literal() + Space + strconv.FormatInt(t.offset, 10)
+			return keyword.Limit.Literal() + Space + strconv.FormatInt(
+				t.limit, 10,
+			) + keyword.Offset.Literal() + Space + strconv.FormatInt(t.offset, 10)
 		}
 		return keyword.Limit.Literal() + Space + strconv.FormatInt(t.limit, 10)
 	} else {

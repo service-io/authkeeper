@@ -5,7 +5,7 @@
 package bei
 
 import (
-	"metis/model/bei/keyword"
+	"metis/model/1.0/bei/keyword"
 )
 
 type UpdateBuilder[T any] struct {
