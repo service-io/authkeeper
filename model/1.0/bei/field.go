@@ -6,7 +6,7 @@ package bei
 
 import (
 	"fmt"
-	"metis/model/bei/keyword"
+	"metis/model/1.0/bei/keyword"
 	"strings"
 )
 
