@@ -1,7 +1,7 @@
 package iris
 
 import (
-	"metis/model/3.0/iris/internal/keyword"
+	"metis/model/3.0/iris/internal/token"
 )
 
 type Order struct {
@@ -16,5 +16,5 @@ func (o *Order) Literal() string {
 	if o.asc {
 		return o.col
 	}
-	return o.col + " " + keyword.Desc.Literal()
+	return o.col + token.Space.Join(token.Desc).Literal()
 }

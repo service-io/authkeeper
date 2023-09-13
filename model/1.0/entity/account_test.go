@@ -9,6 +9,7 @@ import (
 	bei2 "metis/model/1.0/bei"
 	"metis/model/1.0/bei/keyword"
 	"testing"
+	"unsafe"
 )
 
 func TestAccount_Asterisk(t *testing.T) {
@@ -68,4 +69,21 @@ func BenchmarkAccount_Asterisk(b *testing.B) {
 		)
 		_ = account.Evaluator().EvalInfo()
 	}
+}
+
+func TestSize(t *testing.T) {
+	stringSizeof := unsafe.Sizeof("hello, world")
+	funcSizeof := unsafe.Sizeof(func() string {
+		fmt.Println("hello, world")
+		return "hhhh"
+	})
+	structSizeof := unsafe.Sizeof(struct {
+		Name string
+		Age  int64
+		ID   int64
+	}{})
+
+	sliceSizeof := unsafe.Sizeof([]any{})
+
+	fmt.Println(stringSizeof, funcSizeof, structSizeof, sliceSizeof)
 }

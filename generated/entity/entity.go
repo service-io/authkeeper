@@ -31,14 +31,38 @@ func (ag *autogen) GenFuncNew() jen.Code {
 	return nil
 }
 
+func (ag *autogen) GenFuncXCol() jen.Code {
+	return nil
+}
+
 func (ag *autogen) GenFuncConfigure() jen.Code {
 	return nil
 }
 
-func (ag *autogen) GenFuncBEI() jen.Code {
+func (ag *autogen) GenFuncColumnAndValue() jen.Code {
 	return nil
 }
 
-func (ag *autogen) GenFuncFX() jen.Code {
+func (ag *autogen) GenFuncAsterisk() jen.Code {
+	return nil
+}
+
+func (ag *autogen) GenFuncPKey() jen.Code {
+	return nil
+}
+
+func (ag *autogen) GenFuncLogicDelKey() jen.Code {
+	return nil
+}
+
+func (ag *autogen) GenFuncEvaluator() jen.Code {
+	return nil
+}
+
+func (ag *autogen) GenFuncTable() jen.Code {
+	return nil
+}
+
+func (ag *autogen) GenFuncSelf() jen.Code {
 	return nil
 }

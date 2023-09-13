@@ -13,29 +13,46 @@ type Logical struct {
 	cdval string
 }
 
-func OfLogical() *Logical {
+func WithLogical() *Logical {
 	return &Logical{
 		enable: true,
 		key:    "deleted",
 		ddval:  "1",
 		udval:  "0",
-		cdval:  "0",
 	}
 }
 
-func (l *Logical) CurrentDelVal(val string) *Logical {
+func (l *Logical) CurrentVal(val string) *Logical {
 	var logical = l
 	if logical == nil {
-		logical = OfLogical()
+		logical = WithLogical()
 	}
 	logical.cdval = val
 	return logical
 }
 
+func (l *Logical) Key() string {
+	return l.key
+}
+
+func (l *Logical) DeletedVal() string {
+	if len(l.cdval) > 0 {
+		return l.cdval
+	}
+	return l.ddval
+}
+
+func (l *Logical) UndeleteVal() string {
+	if len(l.cdval) > 0 {
+		return l.cdval
+	}
+	return l.udval
+}
+
 func (l *Logical) Enable() *Logical {
 	var logical = l
 	if logical == nil {
-		logical = OfLogical()
+		logical = WithLogical()
 	}
 	logical.enable = true
 	return logical
@@ -44,7 +61,7 @@ func (l *Logical) Enable() *Logical {
 func (l *Logical) Disable() *Logical {
 	var logical = l
 	if logical == nil {
-		logical = OfLogical()
+		logical = WithLogical()
 	}
 	logical.enable = false
 	return logical

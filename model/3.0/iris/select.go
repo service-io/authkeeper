@@ -1,9 +1,7 @@
 package iris
 
 import (
-	"metis/model/3.0/iris/internal/constant"
-	"metis/model/3.0/iris/internal/keyword"
-	"strconv"
+	"metis/model/3.0/iris/internal/token"
 	"strings"
 )
 
@@ -13,36 +11,42 @@ type SelectEvaluator[T any] struct {
 	pageTask Task
 	tasks    []Task
 	hintTask Task
+	mappers  []func(*T) any
 }
 
 func (e *Evaluator[T]) Select(cols ...*Column[T]) *SelectEvaluator[T] {
 	se := &SelectEvaluator[T]{Evaluator: e}
-	task := func(buffers ...*strings.Builder) []any {
-		execFn := func() {
-			buf := buffers[0]
-			buf.WriteString(keyword.Select.Literal())
-			se.hintTask.Idle(buf)
+	if e.hasEvalInfo() {
+		return se
+	}
+	task := func(builders ...*strings.Builder) []any {
+		execFn := func(queryBuilder *strings.Builder) {
+			queryBuilder.WriteString(token.Select.Literal())
+			se.hintTask.Idle(queryBuilder)
 			colLit := make([]string, len(cols))
 			for i, col := range cols {
 				colLit[i] = col.Literal()
+				se.mappers = append(se.mappers, col.Mapper())
 			}
-			buf.WriteString(constant.Space.Literal())
-			buf.WriteString(strings.Join(colLit, constant.CommaSpace.Literal()))
+			queryBuilder.WriteString(token.Space.Literal())
+			queryBuilder.WriteString(strings.Join(colLit, token.CommaSpace.Literal()))
 		}
-		switch len(buffers) {
+		switch len(builders) {
 		case 1:
-			execFn()
+			execFn(builders[0])
 		case 2:
-			execFn()
+			execFn(builders[0])
 			if se.pageable {
-				buf := buffers[1]
-				buf.WriteString(keyword.Select.Literal())
-				buf.WriteString(constant.Space.Literal())
-				buf.WriteString(keyword.Count.Literal())
-				buf.WriteString(constant.LeftParentheses.Literal())
-				buf.WriteString("1")
-				buf.WriteString(constant.RightParentheses.Literal())
+				totalBuilder := builders[1]
+				totalBuilder.WriteString(token.Select.Literal())
+				totalBuilder.WriteString(token.Space.Literal())
+				totalBuilder.WriteString(token.Count.Literal())
+				totalBuilder.WriteString(token.LeftParentheses.Literal())
+				totalBuilder.WriteString("1")
+				totalBuilder.WriteString(token.RightParentheses.Literal())
 			}
+		default:
+			panic("not found any sql builder!")
 		}
 		return nil
 	}
@@ -50,12 +54,19 @@ func (e *Evaluator[T]) Select(cols ...*Column[T]) *SelectEvaluator[T] {
 	return se
 }
 
-func (e *SelectEvaluator[T]) Hint(ks ...keyword.Keyword) *SelectEvaluator[T] {
-	e.hintTask = func(buffers ...*strings.Builder) []any {
-		buf := buffers[0]
+func (e *SelectEvaluator[T]) Hint(ks ...token.Token) *SelectEvaluator[T] {
+	if e.hasEvalInfo() {
+		return e
+	}
+	e.hintTask = func(builders ...*strings.Builder) []any {
+		snipBuilder, release := getBuilder()
+		defer release()
 		for _, k := range ks {
-			buf.WriteString(constant.Space.Literal())
-			buf.WriteString(k.Literal())
+			snipBuilder.WriteString(token.Space.Literal())
+			snipBuilder.WriteString(k.Literal())
+		}
+		for _, builder := range builders {
+			builder.WriteString(snipBuilder.String())
 		}
 		return nil
 	}
@@ -63,12 +74,20 @@ func (e *SelectEvaluator[T]) Hint(ks ...keyword.Keyword) *SelectEvaluator[T] {
 }
 
 func (e *SelectEvaluator[T]) From(rt *RefTable) *SelectEvaluator[T] {
-	task := func(buffers ...*strings.Builder) []any {
-		for _, buffer := range buffers {
-			buffer.WriteString(constant.Space.Literal())
-			buffer.WriteString(keyword.From.Literal())
+	if e.hasEvalInfo() {
+		builder, release := getBuilder()
+		defer release()
+		e.values = append(e.values, rt.Render(builder)...)
+		return e
+	}
+	e.ref = rt
+	task := func(builders ...*strings.Builder) []any {
+		for _, builder := range builders {
+			builder.WriteString(token.Space.Literal())
+			builder.WriteString(token.From.Literal())
 		}
-		values := rt.Render(buffers...)
+		values := rt.Render(builders...)
+		e.defaultLogicalWhere(builders...)
 		return values
 	}
 	e.tasks = append(e.tasks, task)
@@ -76,12 +95,38 @@ func (e *SelectEvaluator[T]) From(rt *RefTable) *SelectEvaluator[T] {
 }
 
 func (e *SelectEvaluator[T]) Where(pred *Predicate) *SelectEvaluator[T] {
-	task := func(buffers ...*strings.Builder) []any {
-		buf := &strings.Builder{}
-		values := pred.Render(buf)
-		for _, buffer := range buffers {
-			buffer.WriteString(keyword.Where.Pretty())
-			buffer.WriteString(buf.String())
+	if e.hasEvalInfo() {
+		builder, release := getBuilder()
+		defer release()
+		e.values = append(e.values, pred.Render(builder)...)
+		return e
+	}
+	e.hasWhere = true
+	task := func(builders ...*strings.Builder) []any {
+		snipBuilder, release := getBuilder()
+		defer release()
+		values := pred.Render(snipBuilder)
+		predSQL := snipBuilder.String()
+		deletedSQL := e.getLogicDeletedSQL()
+		for _, builder := range builders {
+			builder.WriteString(token.Where.Pretty())
+			if e.hasEnableLogical() {
+				if len(deletedSQL) == 0 {
+					builder.WriteString(predSQL)
+					continue
+				}
+				if pred.Mixed() {
+					builder.WriteString(token.LeftParentheses.Literal())
+					builder.WriteString(predSQL)
+					builder.WriteString(token.RightParentheses.Literal())
+				} else {
+					builder.WriteString(predSQL)
+				}
+				builder.WriteString(token.And.Pretty())
+				builder.WriteString(deletedSQL)
+			} else {
+				builder.WriteString(predSQL)
+			}
 		}
 		return values
 	}
@@ -89,15 +134,15 @@ func (e *SelectEvaluator[T]) Where(pred *Predicate) *SelectEvaluator[T] {
 	return e
 }
 
-func (e *SelectEvaluator[T]) GroupBy(cols ...*Column[T]) *SelectEvaluator[T] {
-	task := func(buffers ...*strings.Builder) []any {
+func (e *SelectEvaluator[T]) GroupBy(cols ...Selfish) *SelectEvaluator[T] {
+	task := func(builders ...*strings.Builder) []any {
 		snips := make([]string, len(cols))
 		for i, col := range cols {
-			snips[i] = col.Literal()
+			snips[i] = col.Self()
 		}
-		for _, buffer := range buffers {
-			buffer.WriteString(keyword.GroupBy.Pretty())
-			buffer.WriteString(strings.Join(snips, constant.CommaSpace.Literal()))
+		for _, builder := range builders {
+			builder.WriteString(token.GroupBy.Pretty())
+			builder.WriteString(strings.Join(snips, token.CommaSpace.Literal()))
 		}
 		return nil
 	}
@@ -106,11 +151,17 @@ func (e *SelectEvaluator[T]) GroupBy(cols ...*Column[T]) *SelectEvaluator[T] {
 }
 
 func (e *SelectEvaluator[T]) Having(pred *Predicate) *SelectEvaluator[T] {
-	task := func(buffers ...*strings.Builder) []any {
-		for _, buffer := range buffers {
-			buffer.WriteString(keyword.Having.Pretty())
+	if e.hasEvalInfo() {
+		builder, release := getBuilder()
+		defer release()
+		e.values = append(e.values, pred.Render(builder)...)
+		return e
+	}
+	task := func(builders ...*strings.Builder) []any {
+		for _, builder := range builders {
+			builder.WriteString(token.Having.Pretty())
 		}
-		values := pred.Render(buffers...)
+		values := pred.Render(builders...)
 		return values
 	}
 	e.tasks = append(e.tasks, task)
@@ -118,14 +169,17 @@ func (e *SelectEvaluator[T]) Having(pred *Predicate) *SelectEvaluator[T] {
 }
 
 func (e *SelectEvaluator[T]) OrderBy(orders ...*Order) *SelectEvaluator[T] {
-	task := func(buffers ...*strings.Builder) []any {
-		for _, buffer := range buffers {
-			buffer.WriteString(keyword.OrderBy.Pretty())
+	if e.hasEvalInfo() {
+		return e
+	}
+	task := func(builders ...*strings.Builder) []any {
+		for _, builder := range builders {
+			builder.WriteString(token.OrderBy.Pretty())
 			var snips = make([]string, len(orders))
 			for i, order := range orders {
 				snips[i] = order.Literal()
 			}
-			buffer.WriteString(strings.Join(snips, constant.CommaSpace.Literal()))
+			builder.WriteString(strings.Join(snips, token.CommaSpace.Literal()))
 		}
 		return nil
 	}
@@ -134,44 +188,90 @@ func (e *SelectEvaluator[T]) OrderBy(orders ...*Order) *SelectEvaluator[T] {
 }
 
 func (e *SelectEvaluator[T]) Limit(limit int64) *SelectEvaluator[T] {
-	e.pageTask = func(buffers ...*strings.Builder) []any {
-		buf := buffers[0]
-		buf.WriteString(keyword.Limit.Pretty())
-		buf.WriteString(strconv.FormatInt(limit, 10))
-		return nil
+	if e.hasEvalInfo() {
+		e.values = append(e.values, limit)
+		return e
+	}
+	e.pageTask = func(builders ...*strings.Builder) []any {
+		builder := builders[0]
+		builder.WriteString(token.Limit.Pretty())
+		builder.WriteString(token.Placeholder.Literal())
+		return []any{limit}
 	}
 	return e
 }
 
 func (e *SelectEvaluator[T]) Offset(offset int64) *SelectEvaluator[T] {
+	if e.hasEvalInfo() {
+		e.values = append(e.values, offset)
+		return e
+	}
 	e.pageable = true
 	preTask := e.pageTask
-	e.pageTask = func(buffers ...*strings.Builder) []any {
-		preTask.Idle(buffers...)
-		buf := buffers[0]
-		buf.WriteString(keyword.Offset.Pretty())
-		buf.WriteString(strconv.FormatInt(offset, 10))
-		return nil
+	e.pageTask = func(builders ...*strings.Builder) []any {
+		values := preTask.Idle(builders...)
+		values = append(values, offset)
+		builder := builders[0]
+		builder.WriteString(token.Offset.Pretty())
+		builder.WriteString(token.Placeholder.Literal())
+		return values
 	}
 	return e
 }
 
-func (e *SelectEvaluator[T]) Eval(pss ...PersistService[T]) EvalInfoService[T] {
-	//var buffers []*strings.Builder
-	//var values []any
-	//execSQLBuf := &strings.Builder{}
-	//buffers = append(buffers, execSQLBuf)
-	//if e.pageable {
-	//	buffers = append(buffers, &strings.Builder{})
-	//}
-	//for _, task := range e.tasks {
-	//	values = append(values, task.Idle(buffers...)...)
-	//}
-	//e.pageTask.Idle(execSQLBuf)
-	//fmt.Println(execSQLBuf.String())
-	//if e.pageable {
-	//	fmt.Println(buffers[1].String())
-	//}
-	//fmt.Println(values)
-	return nil
+func (e *SelectEvaluator[T]) Page(limit, offset int64) *SelectEvaluator[T] {
+	if e.hasEvalInfo() {
+		if e.defaultValues != nil {
+			e.defaultValues = append(e.defaultValues, limit, offset)
+		}
+		e.values = append(e.values, limit, offset)
+		return e
+	}
+	e.pageable = true
+	e.pageTask = func(builders ...*strings.Builder) []any {
+		builder := builders[0]
+		builder.WriteString(token.Limit.Pretty())
+		builder.WriteString(token.Placeholder.Literal())
+		builder.WriteString(token.Offset.Pretty())
+		builder.WriteString(token.Placeholder.Literal())
+		return []any{limit, offset}
+	}
+	return e
+}
+
+func (e *SelectEvaluator[T]) Eval() EvalInfoService[T] {
+	if e.hasEvalInfo() {
+		if e.defaultValues == nil {
+			e.ei.values = e.values
+		} else {
+			e.ei.values = e.defaultValues
+		}
+		return e.ei
+	}
+
+	var builders []*strings.Builder
+	var values []any
+	execSQLBuf, execSQLRelease := getBuilder()
+	defer execSQLRelease()
+	totalSQLBuf, totalSQLRelease := getBuilder()
+	defer totalSQLRelease()
+	builders = append(builders, execSQLBuf)
+	if e.pageable {
+		builders = append(builders, totalSQLBuf)
+	}
+	for _, task := range e.tasks {
+		values = append(values, task.Idle(builders...)...)
+	}
+	values = append(values, e.pageTask.Idle(execSQLBuf)...)
+
+	for _, builder := range builders {
+		builder.WriteString(token.Semicolon.Literal())
+	}
+	if e.pageable {
+		e.ei = WithEvalInfo(execSQLBuf.String(), totalSQLBuf.String(), values, e.mappers)
+	} else {
+		e.ei = WithEvalInfo(execSQLBuf.String(), "", values, e.mappers)
+	}
+	e.writeEvalInfo()
+	return e.ei
 }

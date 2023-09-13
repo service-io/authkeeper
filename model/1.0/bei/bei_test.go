@@ -143,6 +143,24 @@ func TestBEI_4(t *testing.T) {
 	fmt.Printf("rs:> %+v\n", persist.Mappers())
 }
 
+func TestPredicate_And(t *testing.T) {
+	account := &Account{}
+	predicate := account.FName().Eq("张三").And(account.FAge().Eq(33).Or(account.FBirthday().Eq("2023-10-10")))
+
+	sql, _ := predicate.SQL()
+
+	fmt.Println(sql)
+}
+
+func BenchmarkPredicate_And(b *testing.B) {
+	account := &Account{}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = account.FName().Eq("张三").And(account.FAge().Eq(33).Or(account.FBirthday().Eq("2023-10-10")))
+	}
+}
+
 func TestBEI_5(t *testing.T) {
 	keyword.RegistryCase(false)
 	account := &Account{}

@@ -65,7 +65,7 @@ func (t *QueryBuilder[T]) WithSQLKey(key string) *QueryBuilder[T] {
 
 func (t *QueryBuilder[T]) WithLogicDeleted(cdv ...string) *QueryBuilder[T] {
 	if !t.enableLogical() {
-		t.logical.Enable()
+		t.logical = t.logical.Enable()
 	}
 	// using last value
 	for _, v := range cdv {

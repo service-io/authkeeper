@@ -17,7 +17,7 @@ type EvalInfo[T any] struct {
 	mappers  []func(*T) any
 }
 
-func OfEvalInfo[T any](execSQL, countSQL string, values []any, mappers []func(*T) any) *EvalInfo[T] {
+func WithEvalInfo[T any](execSQL, countSQL string, values []any, mappers []func(*T) any) *EvalInfo[T] {
 	return &EvalInfo[T]{
 		execSQL:  execSQL,
 		totalSQL: countSQL,
@@ -34,12 +34,24 @@ func (p *EvalInfo[T]) TotalSQL() string {
 	return p.totalSQL
 }
 
+func (p *EvalInfo[T]) Pageable() bool {
+	return len(p.totalSQL) > 0
+}
+
 func (p *EvalInfo[T]) Values() []any {
 	return p.values
 }
 
 func (p *EvalInfo[T]) Mappers() []func(*T) any {
 	return p.mappers
+}
+
+func (p *EvalInfo[T]) MapperRows(t *T) []any {
+	var cs = make([]any, len(p.mappers))
+	for i, mapper := range p.mappers {
+		cs[i] = mapper(t)
+	}
+	return cs
 }
 
 func (p *EvalInfo[T]) EvalInfo() *EvalInfo[T] {

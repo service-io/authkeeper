@@ -7,6 +7,7 @@ package helper
 import (
 	"fmt"
 	"github.com/dave/jennifer/jen"
+	"github.com/iancoleman/strcase"
 	"os"
 	"path/filepath"
 )
@@ -39,4 +40,48 @@ func WriteToFile(f *jen.File, path string, skipExist bool) {
 func IsExists(path string) (os.FileInfo, bool) {
 	f, err := os.Stat(path)
 	return f, err == nil || os.IsExist(err)
+}
+
+const (
+	PKey            = "id"
+	RKey            = "right"
+	LKey            = "left"
+	LlKey           = "level"
+	TnKey           = "tree_no"
+	DKey            = "deleted"
+	NKey            = "name"
+	TtKey           = "tenant_id"
+	PwdKey          = "pwd"
+	AccountTableKey = "plat_account"
+	TtCondKey       = "`tenant_id` = ?"
+	UdCondKey       = "`deleted` = 0"
+	DdCondKey       = "`deleted` = 1"
+	CbKey           = "create_by"
+	CaKey           = "create_at"
+	MbKey           = "modify_by"
+	MaKey           = "modify_at"
+	QuotedKey       = "`"
+)
+
+func DecoratorField(f string) string {
+	return QuotedKey + f + QuotedKey
+}
+
+func InferCode(en bool, code jen.Code) jen.Code {
+	if en {
+		return code
+	}
+	return jen.Null()
+}
+
+func RenderAndField(sn, field string) jen.Code {
+	return jen.Op("&").Id(sn).Dot(strcase.ToCamel(field))
+}
+
+func RenderStarField(sn, field string) jen.Code {
+	return jen.Op("*").Id(sn).Dot(strcase.ToCamel(field))
+}
+
+func RenderField(sn, field string) jen.Code {
+	return jen.Id(sn).Dot(strcase.ToCamel(field))
 }
