@@ -28,6 +28,7 @@ type Option struct {
 	Variables    string
 	routerPrefix string
 	EnableShip   bool
+	shipKey      string
 	Left         *Option
 	Right        *Option
 	Tags         []string
@@ -60,11 +61,11 @@ func BaseOption(module string, table string, tags ...string) *Option {
 	return &Option{
 		Module: module, Table: table, Entity: strcase.ToCamel(table), LowerCamel: strcase.ToLowerCamel(table), Tags: tags, Variable: "eto", Variables: "ets",
 		Package: &Package{
-			Dto: "temp/autogen/dto",
-			Ety: "temp/autogen/entity",
-			Rty: "temp/autogen/" + module + "/repository",
-			Svc: "temp/autogen/" + module + "/service",
-			Api: "temp/autogen/" + module + "/api",
+			Dto: "model/dto",
+			Ety: "model/entity",
+			Rty: "module/" + module + "/repository",
+			Svc: "module/" + module + "/service",
+			Api: "module/" + module + "/api",
 		},
 	}
 }
@@ -72,6 +73,15 @@ func BaseOption(module string, table string, tags ...string) *Option {
 func (o *Option) RouterPrefix(prefix string) *Option {
 	o.routerPrefix = prefix
 	return o
+}
+
+func (o *Option) ShipKey(key string) *Option {
+	o.shipKey = key
+	return o
+}
+
+func (o *Option) GetShipKey() string {
+	return strcase.ToCamel(o.shipKey)
 }
 
 func (o *Option) GetRouterPrefix() string {
@@ -195,10 +205,10 @@ const (
 	pagePkg        = "deepsea/model/page"
 	replyPkg       = "deepsea/model/reply"
 	irisPkg        = "deepsea/model/iris"
-	dtoPkg         = "deepsea/temp/autogen/dto"
-	entityPkg      = "deepsea/temp/autogen/entity"
-	repositoryPkg  = "deepsea/temp/autogen/%s/repository"
-	servicePkg     = "deepsea/temp/autogen/%s/service"
+	dtoPkg         = "deepsea/model/dto"
+	entityPkg      = "deepsea/model/entity"
+	repositoryPkg  = "deepsea/module/%s/repository"
+	servicePkg     = "deepsea/module/%s/service"
 )
 
 func ImportPkg(module string, f *jen.File) {
@@ -279,6 +289,10 @@ func UseIrisRefTable() jen.Code {
 
 func UseIrisEvaluator(name string) jen.Code {
 	return jen.Add(UseIris("Evaluator")).Types(jen.Id(name))
+}
+
+func UseIrisEvaluatorCode(types ...jen.Code) jen.Code {
+	return jen.Add(UseIris("Evaluator")).Types(types...)
 }
 
 func UseIrisConfigService(name string) jen.Code {

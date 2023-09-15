@@ -37,6 +37,8 @@ func (ag *autogen) RenderAuto() {
 	file.Add(ag.GenFuncSelectByIDs())
 	file.Add(ag.GenFuncBatchSelectByID())
 	file.Add(ag.GenFuncSelectByXXX()...)
+	file.Add(ag.GenFuncSelectXXXByYYYID())
+	file.Add(ag.GenFuncSelectYYYByXXXID())
 	file.Add(ag.GenFuncSelectAllWithPage())
 	file.Add(ag.GenFuncInsert())
 	file.Add(ag.GenFuncInsertNonNil())
@@ -111,6 +113,7 @@ func (ag *autogen) GenFuncNewRty() jen.Code {
 func (ag *autogen) GenInterfaceRepository() jen.Code {
 	var idCodes []jen.Code
 	var strCodes []jen.Code
+	var shipCodes []jen.Code
 
 	for _, col := range ag.option.Cols {
 		if strings.HasSuffix(col.ColumnName, "_id") {
@@ -123,6 +126,17 @@ func (ag *autogen) GenInterfaceRepository() jen.Code {
 			code := jen.Line().Line().Comment(fmt.Sprintf("SelectBy%s Query by %s", cn, cn)).Line().Id(fmt.Sprintf("SelectBy%s", cn)).Params(jen.Id("string")).Params(jen.Index().Op("*").Add(helper.UseEntity(ag.option.Entity)))
 			strCodes = append(strCodes, code)
 		}
+	}
+
+	if ag.option.EnableShip {
+		XXX := ag.option.Left  // account
+		YYY := ag.option.Right // role
+		xCode := jen.Line().Line().Comment(fmt.Sprintf("Select%sBy%sID Query %s by %s ID", XXX.Entity, YYY.Entity, XXX.Entity, YYY.Entity)).
+			Line().Id(fmt.Sprintf("Select%sBy%sID", XXX.Entity, YYY.Entity)).Params(jen.Int64()).Params(jen.Index().Op("*").Add(helper.UseEntity(XXX.Entity)))
+		yCode := jen.Line().Line().Comment(fmt.Sprintf("Select%sBy%sID Query %s by %s ID", YYY.Entity, XXX.Entity, YYY.Entity, XXX.Entity)).
+			Line().Id(fmt.Sprintf("Select%sBy%sID", YYY.Entity, XXX.Entity)).Params(jen.Int64()).Params(jen.Index().Op("*").Add(helper.UseEntity(YYY.Entity)))
+
+		shipCodes = append(shipCodes, xCode, yCode)
 	}
 
 	return jen.Line().Comment(fmt.Sprintf("i%sAutoGen 该接口自动生成, 请勿修改", ag.option.Entity)).Line().
@@ -141,6 +155,7 @@ func (ag *autogen) GenInterfaceRepository() jen.Code {
 
 			jen.Add(idCodes...),
 			jen.Add(strCodes...),
+			jen.Add(shipCodes...),
 
 			jen.Line().Comment("SelectAllWithPage Query all entries by page").Line().Id("SelectAllWithPage").Params(jen.Int64(), jen.Int64()).Params(jen.Index().Op("*").Add(helper.UseEntity(ag.option.Entity)), jen.Int64()),
 			jen.Line().Comment("Insert Matches all columns and insert into the table").Line().Id("Insert").Params(jen.Op("*").Add(helper.UseSQLTx()), jen.Op("*").Add(helper.UseEntity(ag.option.Entity))).Int64(),
@@ -587,6 +602,98 @@ func (ag *autogen) GenFuncBatchUpdateByIDWithFunc() jen.Code {
 		jen.Id(ag.option.Variable),
 		jen.Id("fn"))),
 		jen.Return().Id("true"))
+}
+
+func (ag *autogen) GenFuncSelectXXXByYYYID() jen.Code {
+	if !ag.option.EnableShip {
+		return jen.Null()
+	}
+	XXX := ag.option.Left  // account
+	YYY := ag.option.Right // role
+	return ag.funcPrefix().Id(fmt.Sprintf("Select%sBy%sID", XXX.Entity, YYY.Entity)).
+		Params(jen.Id(fmt.Sprintf("%sID", YYY.Entity)).Id("int64")).
+		Params(jen.Index().Op("*").Id("entity").Dot(XXX.Entity)).
+		Block(
+			jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorderByCtx()),
+			jen.Id("rightConfig").Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", YYY.Entity)).Call(),
+			jen.Id("shipConfig").Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", ag.option.Entity)).Call(),
+			jen.Id("leftConfig").Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", XXX.Entity)).Call(),
+			jen.Id("leftConfig").Dot("Configure").Call(
+				jen.Func().Params(jen.Id("eval").Op("*").Add(helper.UseIrisEvaluatorCode(helper.UseEntity(XXX.Entity)))).
+					Block(jen.Id("leftTable").Op(":=").Id("leftConfig").Dot("Table").Call(),
+						jen.Id("shipTable").Op(":=").Id("shipConfig").Dot("Table").Call(),
+						jen.Id("shipTable").Dot("LeftJoin").Call().Dot("OnEQ").Call(jen.Id("leftConfig").Dot("IDCol").
+							Call().Dot("Decorate").Call(jen.Id("leftTable").Dot("Decorate")),
+							jen.Id("shipConfig").Dot(fmt.Sprintf("%sIdCol", XXX.GetShipKey())).Call().Dot("Decorate").Call(jen.Id("shipTable").Dot("Decorate"))),
+						jen.Id("rightTable").Op(":=").Id("rightConfig").Dot("Table").Call(),
+						jen.Id("rightTable").Dot("LeftJoin").Call().Dot("OnEQ").Call(jen.Id("rightConfig").Dot("IDCol").
+							Call().Dot("Decorate").Call(jen.Id("rightTable").Dot("Decorate")),
+							jen.Id("shipConfig").Dot(fmt.Sprintf("%sIdCol", YYY.GetShipKey())).Call().Dot("Decorate").Call(jen.Id("shipTable").Dot("Decorate"))),
+						jen.Id("eval").Dot("Select").Call(jen.Id("leftConfig").Dot("Asterisk").Call(jen.Id("leftTable").Dot("Decorate")).Op("...")).
+							Dot("From").Call(jen.Id("leftTable").Dot("Ref").Call(jen.Id("shipTable"), jen.Id("rightTable"))).
+							Dot("Where").Call(jen.Id("shipConfig").Dot(fmt.Sprintf("%sIdCol", YYY.GetShipKey())).Call().Dot("Decorate").
+							Call(jen.Id("shipTable").Dot("Decorate")).Dot("EQ").Call(jen.Id(fmt.Sprintf("%sID", YYY.Entity)))).
+							Dot("Eval").Call())), jen.Id("evalInfo").Op(":=").Id("leftConfig").Dot("Evaluator").Call().
+				Dot("EvalInfo").Call(), jen.If(jen.Id("evalInfo").Op("==").Id("nil")).
+				Block(jen.Return().Id("nil")), jen.Id("execSQL").Op(":=").Id("evalInfo").Dot("SQL").Call(),
+			jen.Id("values").Op(":=").Id("evalInfo").Dot("Values").Call(),
+			jen.Id("db").Op(":=").Id("database").Dot("FetchDB").Call(),
+			jen.List(jen.Id("stmt"), jen.Id("err")).Op(":=").Id("db").Dot("Prepare").Call(jen.Id("execSQL")),
+			jen.Id("recorder").Dot("MaybePanic").Call(jen.Id("err")), jen.Defer().Add(helper.UseHelper("DeferClose")).Call(jen.Id("stmt"), jen.Id("recorder").Dot("MaybePanic")),
+			jen.List(jen.Id("rows"), jen.Id("err")).Op(":=").Id("stmt").Dot("QueryContext").Call(jen.Id("nil"),
+				jen.Id("values").Op("...")),
+			jen.Id("recorder").Dot("MaybePanic").Call(jen.Id("err")),
+			jen.Id(fmt.Sprintf("%ss", XXX.LowerCamel)).Op(":=").Add(helper.UseRows()).Call(jen.Id("rows"),
+				jen.Func().Params().Params(jen.Op("*").Id("entity").Dot(XXX.Entity),
+					jen.Index().Id("any")).Block(jen.Id(XXX.LowerCamel).Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", XXX.Entity)).Call(),
+					jen.Id("mappers").Op(":=").Id("evalInfo").Dot("MapperRows").Call(jen.Id(XXX.LowerCamel)),
+					jen.Return().List(jen.Id(XXX.LowerCamel), jen.Id("mappers")))), jen.Return().Id(fmt.Sprintf("%ss", XXX.LowerCamel)))
+}
+
+func (ag *autogen) GenFuncSelectYYYByXXXID() jen.Code {
+	if !ag.option.EnableShip {
+		return jen.Null()
+	}
+	XXX := ag.option.Right // role
+	YYY := ag.option.Left  // account
+	return ag.funcPrefix().Id(fmt.Sprintf("Select%sBy%sID", XXX.Entity, YYY.Entity)).
+		Params(jen.Id(fmt.Sprintf("%sID", YYY.Entity)).Id("int64")).
+		Params(jen.Index().Op("*").Id("entity").Dot(XXX.Entity)).
+		Block(
+			jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorderByCtx()),
+			jen.Id("rightConfig").Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", YYY.Entity)).Call(),
+			jen.Id("shipConfig").Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", ag.option.Entity)).Call(),
+			jen.Id("leftConfig").Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", XXX.Entity)).Call(),
+			jen.Id("leftConfig").Dot("Configure").Call(
+				jen.Func().Params(jen.Id("eval").Op("*").Add(helper.UseIrisEvaluatorCode(helper.UseEntity(XXX.Entity)))).
+					Block(jen.Id("leftTable").Op(":=").Id("leftConfig").Dot("Table").Call(),
+						jen.Id("shipTable").Op(":=").Id("shipConfig").Dot("Table").Call(),
+						jen.Id("shipTable").Dot("LeftJoin").Call().Dot("OnEQ").Call(jen.Id("leftConfig").Dot("IDCol").
+							Call().Dot("Decorate").Call(jen.Id("leftTable").Dot("Decorate")),
+							jen.Id("shipConfig").Dot(fmt.Sprintf("%sIdCol", XXX.GetShipKey())).Call().Dot("Decorate").Call(jen.Id("shipTable").Dot("Decorate"))),
+						jen.Id("rightTable").Op(":=").Id("rightConfig").Dot("Table").Call(),
+						jen.Id("rightTable").Dot("LeftJoin").Call().Dot("OnEQ").Call(jen.Id("rightConfig").Dot("IDCol").
+							Call().Dot("Decorate").Call(jen.Id("rightTable").Dot("Decorate")),
+							jen.Id("shipConfig").Dot(fmt.Sprintf("%sIdCol", YYY.GetShipKey())).Call().Dot("Decorate").Call(jen.Id("shipTable").Dot("Decorate"))),
+						jen.Id("eval").Dot("Select").Call(jen.Id("leftConfig").Dot("Asterisk").Call(jen.Id("leftTable").Dot("Decorate")).Op("...")).
+							Dot("From").Call(jen.Id("leftTable").Dot("Ref").Call(jen.Id("shipTable"), jen.Id("rightTable"))).
+							Dot("Where").Call(jen.Id("shipConfig").Dot(fmt.Sprintf("%sIdCol", YYY.GetShipKey())).Call().Dot("Decorate").
+							Call(jen.Id("shipTable").Dot("Decorate")).Dot("EQ").Call(jen.Id(fmt.Sprintf("%sID", YYY.Entity)))).
+							Dot("Eval").Call())), jen.Id("evalInfo").Op(":=").Id("leftConfig").Dot("Evaluator").Call().
+				Dot("EvalInfo").Call(), jen.If(jen.Id("evalInfo").Op("==").Id("nil")).
+				Block(jen.Return().Id("nil")), jen.Id("execSQL").Op(":=").Id("evalInfo").Dot("SQL").Call(),
+			jen.Id("values").Op(":=").Id("evalInfo").Dot("Values").Call(),
+			jen.Id("db").Op(":=").Id("database").Dot("FetchDB").Call(),
+			jen.List(jen.Id("stmt"), jen.Id("err")).Op(":=").Id("db").Dot("Prepare").Call(jen.Id("execSQL")),
+			jen.Id("recorder").Dot("MaybePanic").Call(jen.Id("err")), jen.Defer().Add(helper.UseHelper("DeferClose")).Call(jen.Id("stmt"), jen.Id("recorder").Dot("MaybePanic")),
+			jen.List(jen.Id("rows"), jen.Id("err")).Op(":=").Id("stmt").Dot("QueryContext").Call(jen.Id("nil"),
+				jen.Id("values").Op("...")),
+			jen.Id("recorder").Dot("MaybePanic").Call(jen.Id("err")),
+			jen.Id(fmt.Sprintf("%ss", XXX.LowerCamel)).Op(":=").Add(helper.UseRows()).Call(jen.Id("rows"),
+				jen.Func().Params().Params(jen.Op("*").Id("entity").Dot(XXX.Entity),
+					jen.Index().Id("any")).Block(jen.Id(XXX.LowerCamel).Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", XXX.Entity)).Call(),
+					jen.Id("mappers").Op(":=").Id("evalInfo").Dot("MapperRows").Call(jen.Id(XXX.LowerCamel)),
+					jen.Return().List(jen.Id(XXX.LowerCamel), jen.Id("mappers")))), jen.Return().Id(fmt.Sprintf("%ss", XXX.LowerCamel)))
 }
 
 func (ag *autogen) GenFuncGetDBCtx() jen.Code {

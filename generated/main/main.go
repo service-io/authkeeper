@@ -36,10 +36,17 @@ func main() {
 	recorderx.InitRecorder()
 	// 初始化数据库(单机)
 	database.InitDB()
+	roleTable := helper.BaseOption("my", "my_plat_role").RouterPrefix("role")
+	authTable := helper.BaseOption("my", "my_plat_authority").RouterPrefix("authority")
+	resTable := helper.BaseOption("my", "my_plat_resource").RouterPrefix("resource")
+
+	authResTable := helper.BaseOption("my", "my_plat_authority_resource").RouterPrefix("authority-resource").JoinShip(authTable.ShipKey("Authority"), resTable.ShipKey("Resource"))
+
 	options := []*helper.Option{
-		helper.BaseOption("system", "sys_log").RouterPrefix("sl").AddTag("日志"),
-		helper.BaseOption("system", "sys_oss"),
-		helper.BaseOption("system", "common_area"),
+		roleTable,
+		authTable,
+		authResTable,
+		resTable,
 	}
 
 	for _, option := range options {
