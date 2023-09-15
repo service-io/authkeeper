@@ -1,0 +1,21 @@
+# curl --location --request POST 'http://localhost:9999/register'
+#--header 'Content-Type: application/json'
+#--data-raw '{
+#    "username": "asong",
+#    "nickname": "golang梦工厂",
+#    "email": "7418.com",
+#    "password": "123",
+#    "age": 140
+#}'
+POST http://localhost:9999/register
+Content-Type: application/json
+
+{
+    "nickname": "golang梦工厂",
+    "email": "7418.com",
+    "password": "123",
+    "age": 140
+}
+
+###
+

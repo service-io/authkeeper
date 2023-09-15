@@ -1,0 +1,199 @@
+package entity
+
+import (
+iris "iris"
+"time"
+)
+
+
+type SysLog struct{
+// 主键
+Id * int64 `json:"id"`
+// 标记符
+Sign * string `json:"sign"`
+// 日志模式, 1: 访问日志, 2: 操作日志
+Mode * int8 `json:"mode"`
+// 级别
+Level * string `json:"level"`
+// 调用源
+Source * string `json:"source"`
+// 内容
+Message * string `json:"message"`
+// 追踪 ID
+TraceId * string `json:"traceId"`
+// 原始内容
+Original * string `json:"original"`
+// 日志时间
+At * time.Time `json:"at"`
+// 创建者
+CreateBy * int64 `json:"createBy"`
+// 创建时间
+CreateAt * time.Time `json:"createAt"`
+// 更新人
+ModifyBy * int64 `json:"modifyBy"`
+// 更新时间
+ModifyAt * time.Time `json:"modifyAt"`
+// 逻辑删除 0-否 1-是
+Deleted * int8 `json:"deleted"`
+}
+
+ // NewSysLog 初始化
+ func NewSysLog () * SysLog {
+return & SysLog {}
+}
+
+ // IdCol
+ func (e * SysLog) IdCol () * iris.Column [SysLog] {
+return iris.WithColumn ("id",func (rec * SysLog) (any) {
+return & rec . Id
+})
+}
+ // SignCol
+ func (e * SysLog) SignCol () * iris.Column [SysLog] {
+return iris.WithColumn ("sign",func (rec * SysLog) (any) {
+return & rec . Sign
+})
+}
+ // ModeCol
+ func (e * SysLog) ModeCol () * iris.Column [SysLog] {
+return iris.WithColumn ("mode",func (rec * SysLog) (any) {
+return & rec . Mode
+})
+}
+ // LevelCol
+ func (e * SysLog) LevelCol () * iris.Column [SysLog] {
+return iris.WithColumn ("level",func (rec * SysLog) (any) {
+return & rec . Level
+})
+}
+ // SourceCol
+ func (e * SysLog) SourceCol () * iris.Column [SysLog] {
+return iris.WithColumn ("source",func (rec * SysLog) (any) {
+return & rec . Source
+})
+}
+ // MessageCol
+ func (e * SysLog) MessageCol () * iris.Column [SysLog] {
+return iris.WithColumn ("message",func (rec * SysLog) (any) {
+return & rec . Message
+})
+}
+ // TraceIdCol
+ func (e * SysLog) TraceIdCol () * iris.Column [SysLog] {
+return iris.WithColumn ("trace_id",func (rec * SysLog) (any) {
+return & rec . TraceId
+})
+}
+ // OriginalCol
+ func (e * SysLog) OriginalCol () * iris.Column [SysLog] {
+return iris.WithColumn ("original",func (rec * SysLog) (any) {
+return & rec . Original
+})
+}
+ // AtCol
+ func (e * SysLog) AtCol () * iris.Column [SysLog] {
+return iris.WithColumn ("at",func (rec * SysLog) (any) {
+return & rec . At
+})
+}
+ // CreateByCol
+ func (e * SysLog) CreateByCol () * iris.Column [SysLog] {
+return iris.WithColumn ("create_by",func (rec * SysLog) (any) {
+return & rec . CreateBy
+})
+}
+ // CreateAtCol
+ func (e * SysLog) CreateAtCol () * iris.Column [SysLog] {
+return iris.WithColumn ("create_at",func (rec * SysLog) (any) {
+return & rec . CreateAt
+})
+}
+ // ModifyByCol
+ func (e * SysLog) ModifyByCol () * iris.Column [SysLog] {
+return iris.WithColumn ("modify_by",func (rec * SysLog) (any) {
+return & rec . ModifyBy
+})
+}
+ // ModifyAtCol
+ func (e * SysLog) ModifyAtCol () * iris.Column [SysLog] {
+return iris.WithColumn ("modify_at",func (rec * SysLog) (any) {
+return & rec . ModifyAt
+})
+}
+ // DeletedCol
+ func (e * SysLog) DeletedCol () * iris.Column [SysLog] {
+return iris.WithColumn ("deleted",func (rec * SysLog) (any) {
+return & rec . Deleted
+})
+}
+
+ // Configure
+ func (e * SysLog) Configure (fn func (* iris.Evaluator [SysLog])) {
+if e . evaluator == nil {
+e . evaluator = iris.WithLogicalEvaluator [SysLog] ()
+}
+fn (e . evaluator)
+}
+
+ // ColumnAndValue
+ func (e * SysLog) ColumnAndValue (fns ... func (* iris.Column [SysLog],any) (bool) (selfishs [] iris.Selfish,values [] any)) {
+fn := func (* iris.Column [SysLog],any) (bool) {
+return true
+}
+if len(fns) > 0 {
+fn = fns [0]
+}
+if fn (e . IdCol () {
+selfishs = append(selfishs,e . IdCol ())
+},values = append(values,* e . Id)) if fn (e . SignCol () {
+selfishs = append(selfishs,e . SignCol ())
+},values = append(values,* e . Sign)) if fn (e . ModeCol () {
+selfishs = append(selfishs,e . ModeCol ())
+},values = append(values,* e . Mode)) if fn (e . LevelCol () {
+selfishs = append(selfishs,e . LevelCol ())
+},values = append(values,* e . Level)) if fn (e . SourceCol () {
+selfishs = append(selfishs,e . SourceCol ())
+},values = append(values,* e . Source)) if fn (e . MessageCol () {
+selfishs = append(selfishs,e . MessageCol ())
+},values = append(values,* e . Message)) if fn (e . TraceIdCol () {
+selfishs = append(selfishs,e . TraceIdCol ())
+},values = append(values,* e . TraceId)) if fn (e . OriginalCol () {
+selfishs = append(selfishs,e . OriginalCol ())
+},values = append(values,* e . Original)) if fn (e . AtCol () {
+selfishs = append(selfishs,e . AtCol ())
+},values = append(values,* e . At)) if fn (e . CreateByCol () {
+selfishs = append(selfishs,e . CreateByCol ())
+},values = append(values,* e . CreateBy)) if fn (e . CreateAtCol () {
+selfishs = append(selfishs,e . CreateAtCol ())
+},values = append(values,* e . CreateAt)) if fn (e . ModifyByCol () {
+selfishs = append(selfishs,e . ModifyByCol ())
+},values = append(values,* e . ModifyBy)) if fn (e . ModifyAtCol () {
+selfishs = append(selfishs,e . ModifyAtCol ())
+},values = append(values,* e . ModifyAt)) if fn (e . DeletedCol () {
+selfishs = append(selfishs,e . DeletedCol ())
+},values = append(values,* e . Deleted))
+} return
+
+ // Asterisk
+ func (e * SysLog) Asterisk (fns ... func (string) (string)) ([] * iris.Column [SysLog]) {
+var fn func (string) (string)
+if len(fns) > 0 {
+fn = fns [0]
+}
+return [] * iris.Column [SysLog] {
+e . IdCol () . Decorate (fn)
+e . SignCol () . Decorate (fn)
+e . ModeCol () . Decorate (fn)
+e . LevelCol () . Decorate (fn)
+e . SourceCol () . Decorate (fn)
+e . MessageCol () . Decorate (fn)
+e . TraceIdCol () . Decorate (fn)
+e . OriginalCol () . Decorate (fn)
+e . AtCol () . Decorate (fn)
+e . CreateByCol () . Decorate (fn)
+e . CreateAtCol () . Decorate (fn)
+e . ModifyByCol () . Decorate (fn)
+e . ModifyAtCol () . Decorate (fn)
+e . DeletedCol () . Decorate (fn)
+}
+}

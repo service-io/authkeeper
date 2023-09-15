@@ -7,9 +7,12 @@ package recorderx
 import (
 	"bytes"
 	"context"
+	"fmt"
+	"github.com/fatih/color"
 	"io"
 	"log/slog"
 	"runtime"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -48,7 +51,7 @@ type handleContent struct {
 }
 
 func (h *handleContent) appendTime(ts time.Time) {
-	h.buf.WriteString("")
+	h.buf.WriteString(timeColor.Sprint(ts.Format(TimeFmt)))
 }
 
 func (h *handleContent) appendAttr(attr slog.Attr) {
@@ -193,11 +196,52 @@ var sourcePlh = func() string {
 }()
 
 func simpleSource(s *slog.Source) string {
-	return ""
+	line := s.File + ":" + strconv.Itoa(s.Line)
+
+	if len(line) < sourceLen {
+		return traceColor.Sprint(sourcePlh[:sourceLen-len(line)] + line)
+	}
+	return traceColor.Sprint(line[len(line)-sourceLen:])
 }
 
-var ()
+func genColor(attrs ...color.Attribute) *color.Color {
+	c := color.New(attrs...)
+	c.EnableColor()
+	return c
+}
+
+var (
+	traceColor = genColor(color.FgBlue)
+	debugColor = genColor(color.FgMagenta)
+	infoColor  = genColor(color.FgGreen)
+	warnColor  = genColor(color.FgYellow)
+	errorColor = genColor(color.FgRed)
+	fatalColor = genColor(color.FgHiRed)
+
+	timeColor = genColor(color.FgCyan)
+
+	traceLiteral = traceColor.Sprint(fmt.Sprintf("%-5s", "TRACE"))
+	debugLiteral = debugColor.Sprint(fmt.Sprintf("%-5s", "DEBUG"))
+	infoLiteral  = infoColor.Sprint(fmt.Sprintf("%-5s", "INFO"))
+	warnLiteral  = warnColor.Sprint(fmt.Sprintf("%-5s", "WARN"))
+	errorLiteral = errorColor.Sprint(fmt.Sprintf("%-5s", "ERROR"))
+	fatalLiteral = fatalColor.Sprint(fmt.Sprintf("%-5s", "FATAL"))
+)
 
 func renderLevel(l slog.Level) (level string) {
+	switch l {
+	case LevelTrace:
+		level = traceLiteral
+	case LevelDebug:
+		level = debugLiteral
+	case LevelInfo:
+		level = infoLiteral
+	case LevelWarn:
+		level = warnLiteral
+	case LevelError:
+		level = errorLiteral
+	case LevelFatal:
+		level = fatalLiteral
+	}
 	return
 }

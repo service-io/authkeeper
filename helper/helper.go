@@ -7,11 +7,11 @@ package helper
 import (
 	"crypto/rand"
 	"database/sql"
+	"deepsea/helper/recorderx"
 	"encoding/json"
 	"errors"
 	"io"
 	"math/big"
-	"metis/helper/recorderx"
 	"strings"
 	"unsafe"
 )
@@ -21,7 +21,7 @@ type eface struct {
 	ptr unsafe.Pointer
 }
 
-func DeferClose(closer io.Closer, errHandler ...func(err error)) {
+func DeferClose(closer io.Closer, errHandler ...func(...error)) {
 	err := closer.Close()
 	if err != nil {
 		if len(errHandler) > 0 {
@@ -33,24 +33,24 @@ func DeferClose(closer io.Closer, errHandler ...func(err error)) {
 	}
 }
 
-func HandleRollback(err error, tx *sql.Tx, eh func(err error)) {
+func HandleRollback(err error, tx *sql.Tx, eh func(...error)) {
 	if err != nil {
 		err := tx.Rollback()
 		eh(err)
 	}
 }
 
-func ErrToLog(logger recorderx.Recorder) func(err error) {
-	return func(err error) {
-		if err != nil {
+func ErrToLog(logger recorderx.Recorder) func(...error) {
+	return func(errs ...error) {
+		for _, err := range errs {
 			logger.WithOptions(recorderx.AddCallerSkip(1)).Error(err.Error())
 		}
 	}
 }
 
-func ErrToLogAndPanic(logger recorderx.Recorder) func(err error) {
-	return func(err error) {
-		if err != nil {
+func ErrToLogAndPanic(logger recorderx.Recorder) func(...error) {
+	return func(errs ...error) {
+		for _, err := range errs {
 			logger.WithOptions(recorderx.AddCallerSkip(1)).Error(err.Error())
 			panic(err)
 		}
@@ -89,7 +89,7 @@ func PanicErr(logger recorderx.Recorder, err error) {
 	}
 }
 
-func HandleTx(tx *sql.Tx, eh func(err error)) {
+func HandleTx(tx *sql.Tx, eh func(err ...error)) {
 	err := recover()
 	if err != nil {
 		switch v := err.(type) {

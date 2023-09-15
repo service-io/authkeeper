@@ -6,6 +6,7 @@ package recorderx
 
 import (
 	"context"
+	"deepsea/config/constant"
 	"io"
 	"slices"
 	"strconv"
@@ -79,6 +80,15 @@ type chanWriter struct {
 func (w *chanWriter) Write(bytes []byte) (int, error) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
+
+	if w.sign == nil {
+		value := w.ctx.Value(constant.RecorderDeliverKey)
+		deliver, ok := value.(*deliver)
+		if ok {
+			sign := deliver.signSupplier(deliver.ginCtx)
+			w.sign = &sign
+		}
+	}
 
 	// 高性能, 但是无序
 	// 需要有序处理, 可修改为非协程模式

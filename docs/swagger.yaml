@@ -1,0 +1,6019 @@
+basePath: /api/v1
+definitions:
+  auth.Login:
+    properties:
+      email:
+        description: 邮箱
+        type: string
+      name:
+        description: 账号名称
+        type: string
+      password:
+        description: 账号密码
+        type: string
+      tel:
+        description: 手机号
+        type: string
+      tenantId:
+        description: 租户ID
+        type: integer
+      verifyCode:
+        description: 验证码
+        type: string
+    type: object
+  auth.Refresh:
+    properties:
+      name:
+        description: 登录名称
+        type: string
+      token:
+        description: 刷新令牌
+        type: string
+    type: object
+  auth.Register:
+    properties:
+      avatar:
+        description: 头像
+        type: string
+      email:
+        description: 绑定邮箱
+        type: string
+      mobile:
+        description: 绑定手机号
+        type: string
+      name:
+        description: 账户名
+        type: string
+      pwd:
+        description: 密码
+        type: string
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+  auth.TokenDetail:
+    properties:
+      accessToken:
+        description: 访问令牌
+        type: string
+      expireTime:
+        description: 过期时间
+        type: string
+      name:
+        description: 登录名称
+        type: string
+      refreshToken:
+        description: 刷新令牌
+        type: string
+    type: object
+  dto.CommonArea:
+    properties:
+      code:
+        description: 编码
+        type: string
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      level:
+        description: 级别
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 名称
+        type: string
+      pid:
+        description: 父级ID
+        type: integer
+      pids:
+        description: 父级所有Id用,隔开
+        type: string
+      sort:
+        description: 排序
+        type: integer
+    type: object
+  dto.CommonAreaDTO:
+    properties:
+      code:
+        description: 编码
+        type: string
+      level:
+        description: 级别
+        type: integer
+      name:
+        description: 名称
+        type: string
+      page:
+        description: 当前页
+        type: integer
+      pid:
+        description: 父级ID
+        type: integer
+      pids:
+        description: 父级所有Id用,隔开
+        type: string
+      size:
+        description: 页大小
+        type: integer
+      sort:
+        description: 排序
+        type: integer
+    type: object
+  dto.CommonDict:
+    properties:
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 字典名（英）
+        type: string
+      remark:
+        description: 备注
+        type: string
+      type:
+        description: 字典名（中）
+        type: string
+    type: object
+  dto.CommonDictDTO:
+    properties:
+      name:
+        description: 字典名（英）
+        type: string
+      page:
+        description: 当前页
+        type: integer
+      remark:
+        description: 备注
+        type: string
+      size:
+        description: 页大小
+        type: integer
+      type:
+        description: 字典类型
+        type: string
+    type: object
+  dto.CommonDictData:
+    properties:
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      dictId:
+        description: 字典ID
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      label:
+        description: 字典标签
+        type: string
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      sort:
+        description: 排序
+        type: integer
+      value:
+        description: 字典键值
+        type: integer
+    type: object
+  dto.CommonDictDataDTO:
+    properties:
+      dictId:
+        description: 字典ID
+        type: integer
+      label:
+        description: 字典标签
+        type: string
+      page:
+        description: 当前页
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+      sort:
+        description: 排序
+        type: integer
+      value:
+        description: 字典键值
+        type: integer
+    type: object
+  dto.DirectUploadFile:
+    properties:
+      disposition:
+        allOf:
+        - $ref: '#/definitions/dto.DispositionMode'
+        description: '文件展示形式, 1: 直接预览(inline), 2: 以原文件名的形式下载到浏览器指定路径(attachment),
+          3: 以自定义文件名的形式下载到浏览器指定路径(attachment; filename="YOUR_FILE_NAME")'
+      name:
+        description: 文件名称
+        type: string
+      type:
+        description: 指定文件类型(MIME)。内容类型决定浏览器将以什么形式、什么编码读取文件。如果没有指定文件类型，则根据文件的扩展名生成。如果文件没有扩展名，则文件类型的默认值
+          application/octet-stream
+        type: string
+    type: object
+  dto.DispositionMode:
+    enum:
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - Inline
+    - Attachment
+    - AttachmentCustomizeName
+  dto.Plat:
+    properties:
+      code:
+        description: 编码
+        type: string
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      logo:
+        description: 图标
+        type: string
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+      title:
+        description: 平台名称
+        type: string
+      type:
+        description: 类型
+        type: integer
+      url:
+        description: 访问地址
+        type: string
+    type: object
+  dto.PlatAccount:
+    properties:
+      avatar:
+        description: 头像
+        type: string
+      bindUser:
+        description: 绑定用户
+        type: integer
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      deptId:
+        description: 所属部门
+        type: integer
+      email:
+        description: 绑定邮箱
+        type: string
+      id:
+        description: 主键ID
+        type: integer
+      loginErrors:
+        description: 登录失败次数
+        type: integer
+      loginIp:
+        description: 登录IP
+        type: string
+      loginTime:
+        description: 最后登录时间
+        type: string
+      logins:
+        description: 登录次数
+        type: integer
+      mobile:
+        description: 绑定手机号
+        type: string
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 账户名
+        type: string
+      onlines:
+        description: 在线数
+        type: integer
+      postIds:
+        description: 岗位
+        type: string
+      pwd:
+        description: 密码
+        type: string
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+  dto.PlatAccountDTO:
+    properties:
+      bindUser:
+        description: 绑定用户
+        type: integer
+      deptId:
+        description: 所属部门
+        type: integer
+      email:
+        description: 绑定邮箱
+        type: string
+      mobile:
+        description: 绑定手机号
+        type: string
+      name:
+        description: 账户名
+        type: string
+      page:
+        description: |-
+          租户ID
+          TenantId *int64 `json:"tenantId"`
+          当前页
+        type: integer
+      postIds:
+        description: 岗位
+        type: string
+      size:
+        description: 页大小
+        type: integer
+      status:
+        description: 状态
+        type: integer
+    type: object
+  dto.PlatAccountRole:
+    properties:
+      accountId:
+        description: 账号ID
+        type: integer
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      roleId:
+        description: 角色ID
+        type: integer
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+    type: object
+  dto.PlatAccountRoleDTO:
+    properties:
+      accountId:
+        description: 账号ID
+        type: integer
+      page:
+        description: 当前页
+        type: integer
+      roleId:
+        description: 角色ID
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+      status:
+        description: 状态
+        type: integer
+    type: object
+  dto.PlatAccountToken:
+    properties:
+      accessToken:
+        description: 头像
+        type: string
+      accountId:
+        description: 账户ID
+        type: integer
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键
+        type: integer
+      invalid:
+        description: '是否有效, 0: 有效, 1: 无效'
+        type: integer
+      loginIp:
+        description: 登录IP
+        type: string
+      loginTime:
+        description: 最后登录时间
+        type: string
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 账户名
+        type: string
+      refreshToken:
+        description: 头像
+        type: string
+    type: object
+  dto.PlatAccountTokenDTO:
+    properties:
+      accountId:
+        description: 账户ID
+        type: integer
+      loginIp:
+        description: 登录IP
+        type: string
+      name:
+        description: 账户名
+        type: string
+      page:
+        description: 当前页
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+    type: object
+  dto.PlatAuthority:
+    properties:
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 权限名
+        type: string
+      platId:
+        description: 平台ID
+        type: integer
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+  dto.PlatAuthorityDTO:
+    properties:
+      name:
+        description: 权限名
+        type: string
+      page:
+        description: |-
+          租户ID
+          TenantId *int64 `json:"tenantId"`
+          当前页
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+      status:
+        description: 状态
+        type: integer
+    type: object
+  dto.PlatAuthorityResource:
+    properties:
+      authorityId:
+        description: 权限ID
+        type: integer
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      resourceId:
+        description: 资源ID
+        type: integer
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+  dto.PlatAuthorityResourceDTO:
+    properties:
+      authorityId:
+        description: 权限ID
+        type: integer
+      page:
+        description: |-
+          租户ID
+          TenantId *int64 `json:"tenantId"`
+          当前页
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      resourceId:
+        description: 资源ID
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+    type: object
+  dto.PlatAuthorityResponse:
+    properties:
+      id:
+        description: 主键ID
+        type: integer
+      name:
+        description: 权限名
+        type: string
+      selected:
+        description: 选中状态
+        type: integer
+    type: object
+  dto.PlatDTO:
+    properties:
+      code:
+        description: 编码
+        type: string
+      page:
+        description: 当前页
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+      status:
+        description: 状态
+        type: integer
+      title:
+        description: 平台名称
+        type: string
+      type:
+        description: 类型
+        type: integer
+    type: object
+  dto.PlatResource:
+    properties:
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      icon:
+        description: 图标
+        type: string
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 资源名
+        type: string
+      path:
+        description: api请求地址
+        type: string
+      permission:
+        description: 权限标识
+        type: string
+      pid:
+        description: 父ID
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      router:
+        description: 前端路由
+        type: string
+      sort:
+        description: 排序
+        type: string
+      title:
+        description: 资源标题
+        type: string
+      type:
+        description: 资源类型 1-菜单;2-按钮;3-api
+        type: integer
+    type: object
+  dto.PlatResourceDTO:
+    properties:
+      name:
+        description: 资源名
+        type: string
+      page:
+        description: 当前页
+        type: integer
+      path:
+        description: api地址
+        type: string
+      permission:
+        description: 权限标识
+        type: string
+      pid:
+        description: 父ID
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      router:
+        description: 前端路由
+        type: string
+      size:
+        description: 页大小
+        type: integer
+      title:
+        description: 资源标题
+        type: string
+      type:
+        description: 资源类型
+        type: integer
+    type: object
+  dto.PlatResourceResponse:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/dto.PlatResourceResponse'
+        type: array
+      id:
+        description: 主键ID
+        type: integer
+      name:
+        description: 权限名
+        type: string
+      pid:
+        description: 父ID
+        type: integer
+      selected:
+        description: 选中状态
+        type: integer
+    type: object
+  dto.PlatResponse:
+    properties:
+      id:
+        description: 主键ID
+        type: integer
+      name:
+        description: 权限名
+        type: string
+      selected:
+        description: 选中状态
+        type: integer
+    type: object
+  dto.PlatRole:
+    properties:
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 角色名
+        type: string
+      pid:
+        description: 角色父ID
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+  dto.PlatRoleAuthority:
+    properties:
+      authorityId:
+        description: 权限ID
+        type: integer
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      roleId:
+        description: 角色ID
+        type: integer
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+  dto.PlatRoleAuthorityDTO:
+    properties:
+      authorityId:
+        description: 权限ID
+        type: integer
+      page:
+        description: |-
+          租户ID
+          TenantId *int64 `json:"tenantId"`
+          当前页
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      roleId:
+        description: 角色ID
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+    type: object
+  dto.PlatRoleDTO:
+    properties:
+      name:
+        description: 角色名
+        type: string
+      page:
+        description: |-
+          租户ID
+          TenantId *int64 `json:"tenantId"`
+          当前页
+        type: integer
+      pid:
+        description: 角色父ID
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+      status:
+        description: 状态 1-启用 0-停用
+        type: integer
+    type: object
+  dto.PlatRoleResponse:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/dto.PlatRoleResponse'
+        type: array
+      id:
+        description: 主键ID
+        type: integer
+      name:
+        description: 权限名
+        type: string
+      pid:
+        description: 父ID
+        type: integer
+      selected:
+        description: 选中状态
+        type: integer
+    type: object
+  dto.PlatTenant:
+    properties:
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+      tntId:
+        description: 租户ID
+        type: integer
+    type: object
+  dto.PlatTenantDTO:
+    properties:
+      page:
+        description: 当前页
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+      status:
+        description: 状态
+        type: integer
+      tntId:
+        description: 租户ID
+        type: integer
+    type: object
+  dto.SysLog:
+    properties:
+      at:
+        description: 日志时间
+        type: string
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键
+        type: integer
+      level:
+        description: 级别
+        type: string
+      message:
+        description: 内容
+        type: string
+      mode:
+        description: '日志模式, 1: 访问日志, 2: 操作日志'
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      original:
+        description: 原始内容
+        type: string
+      sign:
+        description: 标记符
+        type: string
+      source:
+        description: 调用源
+        type: string
+      traceId:
+        description: 追踪 ID
+        type: string
+    type: object
+  dto.SysLogDTO:
+    properties:
+      endAt:
+        description: 日志结束时间
+        type: string
+      level:
+        description: 日志级别
+        type: string
+      mode:
+        description: 日志模式
+        type: integer
+      page:
+        description: 当前页
+        type: integer
+      sign:
+        description: 标记符
+        type: string
+      size:
+        description: 页大小
+        type: integer
+      startAt:
+        description: 日志开始时间
+        type: string
+      traceId:
+        description: 追踪ID
+        type: string
+    type: object
+  dto.SysOss:
+    properties:
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleteBy:
+        description: 删除者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      filename:
+        description: 对象名称
+        type: string
+      id:
+        description: 主键
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      objectKey:
+        description: 对象 key
+        type: string
+      objectMeta:
+        description: 元信息
+        type: string
+      uploadBy:
+        description: 上传者
+        type: integer
+    type: object
+  dto.Tenant:
+    properties:
+      bindUser:
+        description: 绑定用户
+        type: integer
+      businessLicense:
+        description: 营业执照
+        type: string
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      legalAddress:
+        description: 注册地址
+        type: string
+      legalMobile:
+        description: 法人电话
+        type: string
+      legalName:
+        description: 法人
+        type: string
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 租户名
+        type: string
+      remark:
+        description: 备注
+        type: string
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+    type: object
+  dto.TenantDTO:
+    properties:
+      bindUser:
+        description: 绑定用户
+        type: integer
+      businessLicense:
+        description: 营业执照
+        type: string
+      legalAddress:
+        description: 注册地址
+        type: string
+      legalMobile:
+        description: 法人电话
+        type: string
+      legalName:
+        description: 法人
+        type: string
+      name:
+        description: 租户名
+        type: string
+      page:
+        description: 当前页
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+      status:
+        description: |-
+          备注
+          Remark *string `json:"remark"`
+          状态
+        type: integer
+    type: object
+  dto.TenantDept:
+    properties:
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      director:
+        description: 负责人
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      mobile:
+        description: 联系电话
+        type: string
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 部门名
+        type: string
+      pid:
+        description: 父ID
+        type: integer
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+  dto.TenantDeptDTO:
+    properties:
+      director:
+        description: 负责人
+        type: integer
+      mobile:
+        description: 联系电话
+        type: string
+      name:
+        description: 部门名
+        type: string
+      page:
+        description: |-
+          租户ID
+          TenantId *int64 `json:"tenantId"`
+          当前页
+        type: integer
+      pid:
+        description: 父ID
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+      status:
+        description: 状态
+        type: integer
+    type: object
+  dto.TenantPost:
+    properties:
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 岗位名
+        type: string
+      pid:
+        description: 父ID
+        type: integer
+      sort:
+        description: 序号
+        type: integer
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+  dto.TenantPostDTO:
+    properties:
+      name:
+        description: 岗位名
+        type: string
+      page:
+        description: |-
+          租户ID
+          TenantId *int64 `json:"tenantId"`
+          当前页
+        type: integer
+      pid:
+        description: 父ID
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+      sort:
+        description: 序号
+        type: integer
+      status:
+        description: 状态
+        type: integer
+    type: object
+  dto.User:
+    properties:
+      address:
+        description: 住址
+        type: string
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      email:
+        description: 邮箱
+        type: string
+      id:
+        description: 主键ID
+        type: integer
+      idCard:
+        description: 证件号
+        type: string
+      mobile:
+        description: 电话
+        type: string
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 用户名
+        type: string
+      nickName:
+        description: 昵称
+        type: string
+      realName:
+        description: 真实姓名
+        type: string
+      remark:
+        description: 备注
+        type: string
+      sex:
+        description: 性别
+        type: integer
+      signStatus:
+        description: 实名状态
+        type: integer
+      source:
+        description: 来源
+        type: string
+      status:
+        description: 用户状态 0-停用;1-启用
+        type: integer
+    type: object
+  dto.UserDTO:
+    properties:
+      address:
+        description: 住址
+        type: string
+      email:
+        description: 邮箱
+        type: string
+      idCard:
+        description: 证件号
+        type: string
+      mobile:
+        description: 电话
+        type: string
+      name:
+        description: 用户名
+        type: string
+      nickName:
+        description: 昵称
+        type: string
+      page:
+        description: 当前页
+        type: integer
+      realName:
+        description: 真实姓名
+        type: string
+      sex:
+        description: 性别
+        type: integer
+      signStatus:
+        description: 实名状态
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+      source:
+        description: 来源
+        type: string
+      status:
+        description: 用户状态
+        type: integer
+    type: object
+  dto.UserSign:
+    properties:
+      cardType:
+        description: 证件类型
+        type: integer
+      channel:
+        description: 认证渠道
+        type: string
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      idCard:
+        description: 证件号
+        type: string
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      realName:
+        description: 真实姓名
+        type: string
+      sex:
+        description: 性别
+        type: integer
+    type: object
+  dto.UserSignDTO:
+    properties:
+      cardType:
+        description: 证件类型
+        type: integer
+      channel:
+        description: 认证渠道
+        type: string
+      idCard:
+        description: 证件号
+        type: string
+      page:
+        description: 当前页
+        type: integer
+      realName:
+        description: 真实姓名
+        type: string
+      sex:
+        description: 性别
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+    type: object
+  dto.UserSignLog:
+    properties:
+      id:
+        description: 主键ID
+        type: integer
+    type: object
+  entity.PlatResource:
+    properties:
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      icon:
+        description: 图标
+        type: string
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 资源名
+        type: string
+      path:
+        description: api请求地址
+        type: string
+      permission:
+        description: 权限标识
+        type: string
+      pid:
+        description: 父ID
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      router:
+        description: 前端路由
+        type: string
+      sort:
+        description: 排序
+        type: string
+      title:
+        description: 资源标题
+        type: string
+      type:
+        description: 资源类型 1-菜单;2-按钮;3-api
+        type: integer
+    type: object
+  page.Query:
+    properties:
+      page:
+        description: 当前页
+        type: integer
+      size:
+        description: 页大小
+        type: integer
+    type: object
+  page.Result:
+    properties:
+      data:
+        description: 分页数据
+      total:
+        description: 总量
+        type: integer
+    type: object
+  reply.Reply:
+    properties:
+      code:
+        description: 错误码
+        type: integer
+      message:
+        description: 响应消息
+        type: string
+      payload:
+        description: 响应负载
+      state:
+        description: 执行状态
+        type: boolean
+    type: object
+  tree.CommonAreaNode:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/tree.CommonAreaNode'
+        type: array
+      code:
+        description: 编码
+        type: string
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      level:
+        description: 级别
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 名称
+        type: string
+      pid:
+        description: 父级ID
+        type: integer
+      pids:
+        description: 父级所有Id用,隔开
+        type: string
+      sort:
+        description: 排序
+        type: integer
+    type: object
+  tree.ResourceNode:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/tree.ResourceNode'
+        type: array
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      icon:
+        description: 图标
+        type: string
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 资源名
+        type: string
+      path:
+        description: api请求地址
+        type: string
+      permission:
+        description: 权限标识
+        type: string
+      pid:
+        description: 父ID
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      router:
+        description: 前端路由
+        type: string
+      sort:
+        description: 排序
+        type: string
+      title:
+        description: 资源标题
+        type: string
+      type:
+        description: 资源类型 1-菜单;2-按钮;3-api
+        type: integer
+    type: object
+  tree.RoleNode:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/tree.RoleNode'
+        type: array
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 角色名
+        type: string
+      pid:
+        description: 角色父ID
+        type: integer
+      platId:
+        description: 平台ID
+        type: integer
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+  tree.TenantDeptNode:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/tree.TenantDeptNode'
+        type: array
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      director:
+        description: 负责人
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      mobile:
+        description: 联系电话
+        type: string
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 部门名
+        type: string
+      pid:
+        description: 父ID
+        type: integer
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+  tree.TenantPostNode:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/tree.TenantPostNode'
+        type: array
+      createAt:
+        description: 创建时间
+        type: string
+      createBy:
+        description: 创建者
+        type: integer
+      deleted:
+        description: 逻辑删除 0-否 1-是
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      modifyAt:
+        description: 更新时间
+        type: string
+      modifyBy:
+        description: 更新人
+        type: integer
+      name:
+        description: 岗位名
+        type: string
+      pid:
+        description: 父ID
+        type: integer
+      sort:
+        description: 序号
+        type: integer
+      status:
+        description: 状态 0-停用;1-启用
+        type: integer
+      tenantId:
+        description: 租户ID
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@deepseaqt.com
+    name: API Support
+    url: http://www.deepseaqt.com/support
+  description: 西太深海平台 api 文档.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://www.deepseaqt.com
+  title: DEEPSEA PLATFORM
+  version: "1.0"
+paths:
+  /common/common-area/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommonArea'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - CommonArea
+  /common/common-area/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommonArea'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - CommonArea
+  /common/common-area/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.CommonArea'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - CommonArea
+  /common/common-area/list:
+    get:
+      description: 查询区域列表
+      parameters:
+      - description: 区域名称
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询区域列表信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/tree.CommonAreaNode'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询区域列表
+      tags:
+      - CommonArea
+  /common/common-area/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - CommonArea
+  /common/common-area/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.CommonAreaDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - CommonArea
+  /common/common-area/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - CommonArea
+  /common/common-area/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 示例
+      tags:
+      - CommonArea
+  /common/common-dict-data/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommonDictData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - CommonDictData
+  /common/common-dict-data/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommonDictData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - CommonDictData
+  /common/common-dict-data/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.CommonDictData'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - CommonDictData
+  /common/common-dict-data/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - CommonDictData
+  /common/common-dict-data/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.CommonDictDataDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - CommonDictData
+  /common/common-dict-data/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - CommonDictData
+  /common/common-dict-data/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - CommonDictData
+  /common/common-dict/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommonDict'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - CommonDict
+  /common/common-dict/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommonDict'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - CommonDict
+  /common/common-dict/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.CommonDict'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - CommonDict
+  /common/common-dict/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - CommonDict
+  /common/common-dict/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.CommonDictDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - CommonDict
+  /common/common-dict/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - CommonDict
+  /common/common-dict/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - CommonDict
+  /platform/plat-account-role/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatAccountRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - PlatAccountRole
+  /platform/plat-account-role/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatAccountRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - PlatAccountRole
+  /platform/plat-account-role/batch-add:
+    put:
+      consumes:
+      - application/json
+      description: 批量新增数据
+      parameters:
+      - description: 账户ID
+        in: query
+        name: accountId
+        required: true
+        type: integer
+      - description: 待新增的数据对象切片
+        in: body
+        name: req_info
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/dto.PlatAccountRole'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 批量新增数据
+      tags:
+      - PlatAccountRole
+  /platform/plat-account-role/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.PlatAccountRole'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - PlatAccountRole
+  /platform/plat-account-role/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - PlatAccountRole
+  /platform/plat-account-role/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.PlatAccountRoleDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - PlatAccountRole
+  /platform/plat-account-role/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - PlatAccountRole
+  /platform/plat-account-role/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - PlatAccountRole
+  /platform/plat-account-token/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatAccountToken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - PlatAccountToken
+  /platform/plat-account-token/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatAccountToken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - PlatAccountToken
+  /platform/plat-account-token/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.PlatAccountToken'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - PlatAccountToken
+  /platform/plat-account-token/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - PlatAccountToken
+  /platform/plat-account-token/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.PlatAccountTokenDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      summary: 按条件分页列表
+      tags:
+      - PlatAccountToken
+  /platform/plat-account-token/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - PlatAccountToken
+  /platform/plat-account-token/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 示例
+      tags:
+      - PlatAccountToken
+  /platform/plat-account/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatAccount'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - PlatAccount
+  /platform/plat-account/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatAccount'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - PlatAccount
+  /platform/plat-account/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.PlatAccount'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - PlatAccount
+  /platform/plat-account/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - PlatAccount
+  /platform/plat-account/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.PlatAccountDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - PlatAccount
+  /platform/plat-account/login:
+    post:
+      consumes:
+      - application/json
+      description: 账号登录接口
+      parameters:
+      - description: 登录对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/auth.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登录成功信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/auth.TokenDetail'
+              type: object
+      summary: 登录接口
+      tags:
+      - PlatAccount
+      - Auth
+  /platform/plat-account/logout:
+    post:
+      consumes:
+      - application/json
+      description: 账号登出接口
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登出结果信息
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 登出接口
+      tags:
+      - PlatAccount
+      - Auth
+  /platform/plat-account/owner:
+    get:
+      description: 查询租户的平台资源列表
+      parameters:
+      - description: 平台ID
+        in: query
+        name: platId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询资源列表信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/entity.PlatResource'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询租户的平台资源列表
+      tags:
+      - PlatResource
+  /platform/plat-account/profile:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录账号详情
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询当前登录账号详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.PlatAccount'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - PlatAccount
+      - Auth
+  /platform/plat-account/refresh:
+    post:
+      consumes:
+      - application/json
+      description: 账号刷新接口
+      parameters:
+      - description: 刷新信息
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/auth.Refresh'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 刷新成功信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/auth.TokenDetail'
+              type: object
+      summary: 刷新接口
+      tags:
+      - PlatAccount
+      - Auth
+  /platform/plat-account/refresh-acl:
+    post:
+      consumes:
+      - application/json
+      description: ACL 刷新接口, 用于刷新权限
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 刷新成功信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/auth.TokenDetail'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: ACL 刷新接口
+      tags:
+      - PlatAccount
+      - Auth
+  /platform/plat-account/register:
+    post:
+      consumes:
+      - application/json
+      description: 账号注册接口
+      parameters:
+      - description: 注册对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/auth.Register'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 注册成功信息
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 注册接口
+      tags:
+      - PlatAccount
+      - Auth
+  /platform/plat-account/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - PlatAccount
+  /platform/plat-authority-resource/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatAuthorityResource'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - PlatAuthorityResource
+  /platform/plat-authority-resource/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatAuthorityResource'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - PlatAuthorityResource
+  /platform/plat-authority-resource/batch-add:
+    put:
+      consumes:
+      - application/json
+      description: 批量新增数据
+      parameters:
+      - description: 平台ID
+        in: query
+        name: platId
+        required: true
+        type: integer
+      - description: 权限ID
+        in: query
+        name: authorityId
+        required: true
+        type: integer
+      - description: 待新增的数据对象切片
+        in: body
+        name: req_info
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/dto.PlatAuthorityResource'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 批量新增数据
+      tags:
+      - PlatAuthorityResource
+  /platform/plat-authority-resource/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.PlatAuthorityResource'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - PlatAuthorityResource
+  /platform/plat-authority-resource/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - PlatAuthorityResource
+  /platform/plat-authority-resource/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.PlatAuthorityResourceDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - PlatAuthorityResource
+  /platform/plat-authority-resource/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - PlatAuthorityResource
+  /platform/plat-authority-resource/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 示例
+      tags:
+      - PlatAuthorityResource
+  /platform/plat-authority/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatAuthority'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - PlatAuthority
+  /platform/plat-authority/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatAuthority'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - PlatAuthority
+  /platform/plat-authority/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.PlatAuthority'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - PlatAuthority
+  /platform/plat-authority/list:
+    get:
+      description: 查询权限列表
+      parameters:
+      - description: 平台ID
+        in: query
+        name: platId
+        required: true
+        type: integer
+      - description: 角色ID
+        in: query
+        name: roleId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询权限列表信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/dto.PlatAuthorityResponse'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询权限列表
+      tags:
+      - PlatAuthority
+  /platform/plat-authority/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - PlatAuthority
+  /platform/plat-authority/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.PlatAuthorityDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - PlatAuthority
+  /platform/plat-authority/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - PlatAuthority
+  /platform/plat-authority/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - PlatAuthority
+  /platform/plat-resource/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatResource'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - PlatResource
+  /platform/plat-resource/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatResource'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - PlatResource
+  /platform/plat-resource/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.PlatResource'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - PlatResource
+  /platform/plat-resource/list:
+    get:
+      description: 查询资源列表
+      parameters:
+      - description: 平台ID
+        in: query
+        name: platId
+        required: true
+        type: integer
+      - description: 权限ID
+        in: query
+        name: authorityId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询资源列表信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/dto.PlatResourceResponse'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询资源列表
+      tags:
+      - PlatResource
+  /platform/plat-resource/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - PlatResource
+  /platform/plat-resource/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.PlatResourceDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - PlatResource
+  /platform/plat-resource/plat:
+    get:
+      description: 查询资源列表
+      parameters:
+      - description: 平台ID
+        in: query
+        name: platId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询资源列表信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/tree.ResourceNode'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询资源列表
+      tags:
+      - PlatResource
+  /platform/plat-resource/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - PlatResource
+  /platform/plat-resource/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKe: []
+      summary: 示例
+      tags:
+      - PlatResource
+  /platform/plat-role-authority/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatRoleAuthority'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - PlatRoleAuthority
+  /platform/plat-role-authority/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatRoleAuthority'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - PlatRoleAuthority
+  /platform/plat-role-authority/batch-add:
+    put:
+      consumes:
+      - application/json
+      description: 批量新增数据
+      parameters:
+      - description: 平台ID
+        in: query
+        name: platId
+        required: true
+        type: integer
+      - description: 角色ID
+        in: query
+        name: roleId
+        required: true
+        type: integer
+      - description: 待新增的数据对象切片
+        in: body
+        name: req_info
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/dto.PlatRoleAuthority'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 批量新增数据
+      tags:
+      - PlatRoleAuthority
+  /platform/plat-role-authority/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.PlatRoleAuthority'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - PlatRoleAuthority
+  /platform/plat-role-authority/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - PlatRoleAuthority
+  /platform/plat-role-authority/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.PlatRoleAuthorityDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - PlatRoleAuthority
+  /platform/plat-role-authority/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - PlatRoleAuthority
+  /platform/plat-role-authority/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 示例
+      tags:
+      - PlatRoleAuthority
+  /platform/plat-role/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - PlatRole
+  /platform/plat-role/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - PlatRole
+  /platform/plat-role/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.PlatRole'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - PlatRole
+  /platform/plat-role/list:
+    get:
+      description: 查询角色列表
+      parameters:
+      - description: 角色名称
+        in: query
+        name: name
+        type: string
+      - description: 角色状态
+        in: query
+        name: status
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询角色列表信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/tree.RoleNode'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询角色列表
+      tags:
+      - PlatRole
+  /platform/plat-role/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - PlatRole
+  /platform/plat-role/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.PlatRoleDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - PlatRole
+  /platform/plat-role/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - PlatRole
+  /platform/plat-role/tree:
+    get:
+      description: 查询角色列表树
+      parameters:
+      - description: 账户ID
+        in: query
+        name: accountId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询角色列表信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/dto.PlatRoleResponse'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询角色列表树
+      tags:
+      - PlatRole
+  /platform/plat-role/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - PlatRole
+  /platform/plat-tenant/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatTenant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - PlatTenant
+  /platform/plat-tenant/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PlatTenant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - PlatTenant
+  /platform/plat-tenant/batch-add:
+    put:
+      consumes:
+      - application/json
+      description: 批量新增数据
+      parameters:
+      - description: 租户ID
+        in: query
+        name: tenantId
+        required: true
+        type: integer
+      - description: 待新增的数据对象切片
+        in: body
+        name: req_info
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/dto.PlatTenant'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 批量新增数据
+      tags:
+      - PlatTenant
+  /platform/plat-tenant/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.PlatTenant'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - PlatTenant
+  /platform/plat-tenant/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - PlatTenant
+  /platform/plat-tenant/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.PlatTenantDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - PlatTenant
+  /platform/plat-tenant/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - PlatTenant
+  /platform/plat-tenant/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 示例
+      tags:
+      - PlatTenant
+  /platform/plat/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Plat'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - Plat
+  /platform/plat/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Plat'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - Plat
+  /platform/plat/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.Plat'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - Plat
+  /platform/plat/list:
+    get:
+      description: 查询租户平台列表
+      parameters:
+      - description: 租户ID
+        in: query
+        name: tenantId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询租户平台列表信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/dto.PlatResponse'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询租户平台列表
+      tags:
+      - Plat
+  /platform/plat/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - Plat
+  /platform/plat/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.PlatDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - Plat
+  /platform/plat/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - Plat
+  /platform/plat/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - Plat
+  /system/sys-log/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SysLog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - SysLog
+  /system/sys-log/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SysLog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - SysLog
+  /system/sys-log/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.SysLog'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - SysLog
+  /system/sys-log/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - SysLog
+  /system/sys-log/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.SysLogDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - SysLog
+  /system/sys-log/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - SysLog
+  /system/sys-log/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 示例
+      tags:
+      - SysLog
+  /system/sys-oss/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SysOss'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - SysOss
+  /system/sys-oss/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SysOss'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - SysOss
+  /system/sys-oss/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.SysOss'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - SysOss
+  /system/sys-oss/direct-upload:
+    post:
+      consumes:
+      - application/json
+      description: 直传文件至 OSS 服务, 在低带宽模式下使用, 该请求返回一个可用于直传的签名链接(3分钟内有效)
+      parameters:
+      - description: 文件对象信息
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DirectUploadFile'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 上传结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 直传文件
+      tags:
+      - SysOss
+      - 上传下载服务
+  /system/sys-oss/get/{key}:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定 key 的文件
+      parameters:
+      - description: 对象 key
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 签名 URL
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取指定 key
+      tags:
+      - SysOss
+      - 上传下载服务
+  /system/sys-oss/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - SysOss
+  /system/sys-oss/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - SysOss
+  /system/sys-oss/sign-url/{key}:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定 key 的签名 URL
+      parameters:
+      - description: 对象 key
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 签名 URL
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取指定 key 的签名 URL
+      tags:
+      - SysOss
+      - 上传下载服务
+  /system/sys-oss/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 上传文件(中转模式), 由服务端代为上传, 高带宽下使用
+      parameters:
+      - collectionFormat: csv
+        description: 文件列表
+        in: formData
+        items:
+          type: file
+        name: file
+        required: true
+        type: array
+      - collectionFormat: csv
+        description: 文件名称(与列表一一对应)
+        in: formData
+        items:
+          type: string
+        name: name
+        type: array
+      - description: '文件展示形式, 1: 直接预览(inline 默认), 2: 以原文件名的形式下载到浏览器指定路径(attachment),
+          3: 以自定义文件名的形式下载到浏览器指定路径(attachment; filename='
+        enum:
+        - 1
+        - 2
+        - 3
+        in: formData
+        name: disposition
+        type: integer
+      - description: 指定文件类型(MIME)。内容类型决定浏览器将以什么形式、什么编码读取文件。如果没有指定文件类型，则根据文件的扩展名生成。如果文件没有扩展名，则文件类型的默认值
+          application/octet-stream
+        in: formData
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 上传结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 上传文件(中转模式)
+      tags:
+      - SysOss
+      - 上传下载服务
+  /tenant/tenant-dept/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TenantDept'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - TenantDept
+  /tenant/tenant-dept/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TenantDept'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - TenantDept
+  /tenant/tenant-dept/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.TenantDept'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - TenantDept
+  /tenant/tenant-dept/list:
+    get:
+      description: 查询租户部门列表
+      parameters:
+      - description: 租户部门名称
+        in: query
+        name: name
+        type: string
+      - description: 租户部门状态
+        in: query
+        name: status
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询租户部门列表信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/tree.TenantDeptNode'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询租户部门列表
+      tags:
+      - TenantDept
+  /tenant/tenant-dept/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - TenantDept
+  /tenant/tenant-dept/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.TenantDeptDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - TenantDept
+  /tenant/tenant-dept/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - TenantDept
+  /tenant/tenant-dept/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - TenantDept
+  /tenant/tenant-post/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TenantPost'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - TenantPost
+  /tenant/tenant-post/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TenantPost'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - TenantPost
+  /tenant/tenant-post/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.TenantPost'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - TenantPost
+  /tenant/tenant-post/list:
+    get:
+      description: 查询租户职位列表
+      parameters:
+      - description: 租户职位名称
+        in: query
+        name: name
+        type: string
+      - description: 租户职位状态
+        in: query
+        name: status
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询租户职位列表信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/tree.TenantPostNode'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询租户职位列表
+      tags:
+      - TenantPost
+  /tenant/tenant-post/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - TenantPost
+  /tenant/tenant-post/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.TenantPostDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - TenantPost
+  /tenant/tenant-post/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - TenantPost
+  /tenant/tenant-post/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - TenantPost
+  /tenant/tenant/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Tenant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - Tenant
+  /tenant/tenant/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Tenant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - Tenant
+  /tenant/tenant/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.Tenant'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - Tenant
+  /tenant/tenant/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - Tenant
+  /tenant/tenant/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.TenantDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - Tenant
+  /tenant/tenant/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - Tenant
+  /tenant/tenant/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - Tenant
+  /user/user-sign-log/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserSignLog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - UserSignLog
+  /user/user-sign-log/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserSignLog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - UserSignLog
+  /user/user-sign-log/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.UserSignLog'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - UserSignLog
+  /user/user-sign-log/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - UserSignLog
+  /user/user-sign-log/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - UserSignLog
+  /user/user-sign-log/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - UserSignLog
+  /user/user-sign/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserSign'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - UserSign
+  /user/user-sign/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserSign'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - UserSign
+  /user/user-sign/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.UserSign'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - UserSign
+  /user/user-sign/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - UserSign
+  /user/user-sign/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.UserSignDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - UserSign
+  /user/user-sign/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - UserSign
+  /user/user-sign/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - UserSign
+  /user/user/add:
+    put:
+      consumes:
+      - application/json
+      description: 新增数据
+      parameters:
+      - description: 待新增的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - User
+  /user/user/base-modify:
+    post:
+      consumes:
+      - application/json
+      description: 根据 ID 修改数据
+      parameters:
+      - description: 待修改的数据对象
+        in: body
+        name: req_info
+        required: true
+        schema:
+          $ref: '#/definitions/dto.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - User
+  /user/user/detail:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取详情
+      parameters:
+      - description: 查询 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询详情
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  $ref: '#/definitions/dto.User'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取详情
+      tags:
+      - User
+  /user/user/list-page:
+    post:
+      consumes:
+      - application/json
+      description: 获取分页列表
+      parameters:
+      - description: 分页信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/page.Query'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页列表
+      tags:
+      - User
+  /user/user/list-page-condition:
+    post:
+      consumes:
+      - application/json
+      description: 按条件获取分页列表
+      parameters:
+      - description: 分页查询信息
+        in: body
+        name: req_info
+        schema:
+          $ref: '#/definitions/dto.UserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分页列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/reply.Reply'
+            - properties:
+                payload:
+                  items:
+                    $ref: '#/definitions/page.Result'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 按条件分页列表
+      tags:
+      - User
+  /user/user/remove:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除数据
+      parameters:
+      - description: 待删除 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - User
+  /user/user/whoami:
+    get:
+      consumes:
+      - application/json
+      description: 示例
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/reply.Reply'
+      summary: 示例
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: DeepseaQt-Auth
+    type: apiKey
+swagger: "2.0"
