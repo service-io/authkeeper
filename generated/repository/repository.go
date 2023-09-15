@@ -131,10 +131,10 @@ func (ag *autogen) GenInterfaceRepository() jen.Code {
 	if ag.option.EnableShip {
 		XXX := ag.option.Left  // account
 		YYY := ag.option.Right // role
-		xCode := jen.Line().Line().Comment(fmt.Sprintf("Select%sBy%sID Query %s by %s ID", XXX.Entity, YYY.Entity, XXX.Entity, YYY.Entity)).
-			Line().Id(fmt.Sprintf("Select%sBy%sID", XXX.Entity, YYY.Entity)).Params(jen.Int64()).Params(jen.Index().Op("*").Add(helper.UseEntity(XXX.Entity)))
-		yCode := jen.Line().Line().Comment(fmt.Sprintf("Select%sBy%sID Query %s by %s ID", YYY.Entity, XXX.Entity, YYY.Entity, XXX.Entity)).
-			Line().Id(fmt.Sprintf("Select%sBy%sID", YYY.Entity, XXX.Entity)).Params(jen.Int64()).Params(jen.Index().Op("*").Add(helper.UseEntity(YYY.Entity)))
+		xCode := jen.Line().Line().Comment(fmt.Sprintf("Select%sBy%sID Query %s by %s ID", XXX.GetShipKey(), YYY.GetShipKey(), XXX.GetShipKey(), YYY.GetShipKey())).
+			Line().Id(fmt.Sprintf("Select%sBy%sID", XXX.GetShipKey(), YYY.GetShipKey())).Params(jen.Int64()).Params(jen.Index().Op("*").Add(helper.UseEntity(XXX.Entity)))
+		yCode := jen.Line().Line().Comment(fmt.Sprintf("Select%sBy%sID Query %s by %s ID", YYY.GetShipKey(), XXX.GetShipKey(), YYY.GetShipKey(), XXX.GetShipKey())).
+			Line().Id(fmt.Sprintf("Select%sBy%sID", YYY.GetShipKey(), XXX.GetShipKey())).Params(jen.Int64()).Params(jen.Index().Op("*").Add(helper.UseEntity(YYY.Entity)))
 
 		shipCodes = append(shipCodes, xCode, yCode)
 	}
@@ -184,9 +184,9 @@ func (ag *autogen) funcPrefix(codes ...jen.Code) *jen.Statement {
 
 func (ag *autogen) GenFuncSelectOneByConfig() jen.Code {
 	return ag.funcPrefix().Id("SelectOneByConfig").Params(helper.UseIrisNamedConfigServiceCode(helper.UseEntity(ag.option.Entity))).Params(jen.Op("*").Add(helper.UseEntity(ag.option.Entity))).
-		Block(jen.If(jen.Id("config").Op("!=").Nil()).Block(jen.Return().Nil()),
+		Block(jen.If(jen.Id("config").Op("==").Nil()).Block(jen.Return().Nil()),
 			jen.Id("evaluator").Op(":=").Id("config").Dot("Evaluator").Call(),
-			jen.If(jen.Id("evaluator").Op("!=").Nil()).Block(jen.Return().Nil()),
+			jen.If(jen.Id("evaluator").Op("==").Nil()).Block(jen.Return().Nil()),
 			jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorderByCtx()),
 			jen.Id("evalInfo").Op(":=").Id("evaluator").Dot("EvalInfo").Call(),
 			jen.Id("execSQL").Op(":=").Id("evalInfo").Dot("SQL").Call(),
@@ -210,9 +210,9 @@ func (ag *autogen) GenFuncSelectOneByConfig() jen.Code {
 
 func (ag *autogen) GenFuncSelectManyByConfig() jen.Code {
 	return ag.funcPrefix().Id("SelectManyByConfig").Params(helper.UseIrisNamedConfigServiceCode(helper.UseEntity(ag.option.Entity))).
-		Params(jen.Index().Op("*").Add(helper.UseEntity(ag.option.Entity))).Block(jen.If(jen.Id("config").Op("!=").Nil()).Block(jen.Return().Nil()),
+		Params(jen.Index().Op("*").Add(helper.UseEntity(ag.option.Entity))).Block(jen.If(jen.Id("config").Op("==").Nil()).Block(jen.Return().Nil()),
 		jen.Id("evaluator").Op(":=").Id("config").Dot("Evaluator").Call(),
-		jen.If(jen.Id("evaluator").Op("!=").Nil()).Block(jen.Return().Nil()),
+		jen.If(jen.Id("evaluator").Op("==").Nil()).Block(jen.Return().Nil()),
 		jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorderByCtx()),
 		jen.Id("evalInfo").Op(":=").Id("evaluator").Dot("EvalInfo").Call(),
 		jen.Id("execSQL").Op(":=").Id("evalInfo").Dot("SQL").Call(),
@@ -238,10 +238,10 @@ func (ag *autogen) GenFuncSelectManyByConfig() jen.Code {
 
 func (ag *autogen) GenFuncSelectPageByConfig() jen.Code {
 	return ag.funcPrefix().Id("SelectPageByConfig").Params(helper.UseIrisNamedConfigServiceCode(helper.UseEntity(ag.option.Entity))).Params(jen.Index().Op("*").Add(helper.UseEntity(ag.option.Entity)),
-		jen.Int64()).Block(jen.If(jen.Id("config").Op("!=").Nil()).Block(jen.Return().List(jen.Nil(),
+		jen.Int64()).Block(jen.If(jen.Id("config").Op("==").Nil()).Block(jen.Return().List(jen.Nil(),
 		jen.Lit(0))),
 		jen.Id("evaluator").Op(":=").Id("config").Dot("Evaluator").Call(),
-		jen.If(jen.Id("evaluator").Op("!=").Nil()).Block(jen.Return().List(jen.Nil(),
+		jen.If(jen.Id("evaluator").Op("==").Nil()).Block(jen.Return().List(jen.Nil(),
 			jen.Lit(0))),
 		jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorderByCtx()),
 		jen.Id("evalInfo").Op(":=").Id("evaluator").Dot("EvalInfo").Call(),
@@ -274,7 +274,7 @@ func (ag *autogen) GenFuncSelectPageByConfig() jen.Code {
 				jen.Id("recorder").Dot("MaybePanic")),
 			jen.Id("recorder").Dot("MaybePanic").Call(jen.Id("err")),
 			jen.Id("row").Op(":=").Id("stmt").Dot("QueryRowContext").Call(jen.Id("ag").Dot("getDBCtx").Call(),
-				jen.Id("values").Op("...")),
+				jen.Id("values").Index(jen.Empty(), jen.Len(jen.Id("values")).Op("-").Lit(2)).Op("...")),
 			jen.Id("total").Op(":=").Add(helper.UseRow()).Call(jen.Id("row"),
 				jen.Func().Params().Params(jen.Op("*").Op("*").Int64(),
 					jen.Index().Id("any")).Block(jen.Null().Var().Id("r").Op("*").Int64(),
@@ -291,9 +291,9 @@ func (ag *autogen) GenFuncSelectPageByConfig() jen.Code {
 
 func (ag *autogen) GenFuncInsertByConfig() jen.Code {
 	return ag.funcPrefix().Id("InsertByConfig").Params(jen.Id("tx").Op("*").Add(helper.UseSQLTx()), helper.UseIrisNamedConfigServiceCode(helper.UseEntity(ag.option.Entity))).
-		Params(jen.Id("bool")).Block(jen.If(jen.Id("config").Op("!=").Nil()).Block(jen.Return().Id("false")),
+		Params(jen.Id("bool")).Block(jen.If(jen.Id("config").Op("==").Nil()).Block(jen.Return().Id("false")),
 		jen.Id("evaluator").Op(":=").Id("config").Dot("Evaluator").Call(),
-		jen.If(jen.Id("evaluator").Op("!=").Nil()).Block(jen.Return().Id("false")),
+		jen.If(jen.Id("evaluator").Op("==").Nil()).Block(jen.Return().Id("false")),
 		jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorderByCtx()),
 		jen.Id("evalInfo").Op(":=").Id("evaluator").Dot("EvalInfo").Call(),
 		jen.Id("execSQL").Op(":=").Id("evalInfo").Dot("SQL").Call(),
@@ -319,9 +319,9 @@ func (ag *autogen) GenFuncInsertByConfig() jen.Code {
 
 func (ag *autogen) GenFuncUpdateByConfig() jen.Code {
 	return ag.funcPrefix().Id("UpdateByConfig").Params(jen.Id("tx").Op("*").Add(helper.UseSQLTx()), helper.UseIrisNamedConfigServiceCode(helper.UseEntity(ag.option.Entity))).
-		Params(jen.Id("bool")).Block(jen.If(jen.Id("config").Op("!=").Nil()).Block(jen.Return().Id("false")),
+		Params(jen.Id("bool")).Block(jen.If(jen.Id("config").Op("==").Nil()).Block(jen.Return().Id("false")),
 		jen.Id("evaluator").Op(":=").Id("config").Dot("Evaluator").Call(),
-		jen.If(jen.Id("evaluator").Op("!=").Nil()).Block(jen.Return().Id("false")),
+		jen.If(jen.Id("evaluator").Op("==").Nil()).Block(jen.Return().Id("false")),
 		jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorderByCtx()),
 		jen.Id("evalInfo").Op(":=").Id("evaluator").Dot("EvalInfo").Call(),
 		jen.Id("execSQL").Op(":=").Id("evalInfo").Dot("SQL").Call(),
@@ -343,9 +343,9 @@ func (ag *autogen) GenFuncUpdateByConfig() jen.Code {
 
 func (ag *autogen) GenFuncDeleteByConfig() jen.Code {
 	return ag.funcPrefix().Id("DeleteByConfig").Params(jen.Id("tx").Op("*").Add(helper.UseSQLTx()), helper.UseIrisNamedConfigServiceCode(helper.UseEntity(ag.option.Entity))).
-		Params(jen.Id("bool")).Block(jen.If(jen.Id("config").Op("!=").Nil()).Block(jen.Return().Id("false")),
+		Params(jen.Id("bool")).Block(jen.If(jen.Id("config").Op("==").Nil()).Block(jen.Return().Id("false")),
 		jen.Id("evaluator").Op(":=").Id("config").Dot("Evaluator").Call(),
-		jen.If(jen.Id("evaluator").Op("!=").Nil()).Block(jen.Return().Id("false")),
+		jen.If(jen.Id("evaluator").Op("==").Nil()).Block(jen.Return().Id("false")),
 		jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorderByCtx()),
 		jen.Id("evalInfo").Op(":=").Id("evaluator").Dot("EvalInfo").Call(),
 		jen.Id("execSQL").Op(":=").Id("evalInfo").Dot("SQL").Call(),
@@ -469,17 +469,18 @@ func (ag *autogen) GenFuncInsertWithFunc() jen.Code {
 			jen.Id("any")).Bool()).Int64().
 		Block(
 			jen.If(jen.Id(ag.option.Variable).Dot("Evaluator").Call().Op("!=").Nil()).
-				Block(jen.Id("ag").Dot("InsertByConfig").Call(jen.Id("tx"),
-					jen.Id(ag.option.Variable)),
+				Block(
+					jen.If(jen.Op("!").Id("ag").Dot("InsertByConfig").Call(jen.Id("tx"),
+						jen.Id(ag.option.Variable))).Block(jen.Return(jen.Lit(0))),
 					jen.Return().Op("*").Id(ag.option.Variable).Dot("ID")),
-			jen.Id("config").Op(":=").Add(helper.UseEntity(fmt.Sprintf("New%s", ag.option.Entity))).Call(),
+			jen.Id("config").Op(":=").Id(ag.option.Variable),
 			jen.List(jen.Id("selfishs"),
 				jen.Id("values")).Op(":=").Id(ag.option.Variable).Dot("ColumnAndValue").Call(jen.Id("fn")),
 			jen.Id("config").Dot("Configure").Call(jen.Func().Params(jen.Id("eval").Op("*").Id("iris").Dot("Evaluator").Index(helper.UseEntity(ag.option.Entity))).
 				Block(jen.Id("eval").Dot("Insert").Call(jen.Id("selfishs").Op("...")).
 					Dot("Into").Call(jen.Id("config").Dot("Table").Call()).Dot("Values").Call(jen.Id("values").Op("...")).
 					Dot("Eval").Call())),
-			jen.Id("ag").Dot("InsertByConfig").Call(jen.Id("tx"), jen.Id("config")),
+			jen.If(jen.Op("!").Id("ag").Dot("InsertByConfig").Call(jen.Id("tx"), jen.Id("config"))).Block(jen.Return(jen.Lit(0))),
 			jen.Return().Op("*").Id("config").Dot("ID"))
 }
 
@@ -512,12 +513,13 @@ func (ag *autogen) GenFuncBatchInsertWithFunc() jen.Code {
 				jen.Id("len").Call(jen.Id(ag.option.Variables))),
 			jen.For(jen.List(jen.Id("i"),
 				jen.Id("e")).Op(":=").Range().Id(ag.option.Variables)).Block(jen.Id("ids").Index(jen.Id("i")).Op("=").Op("*").Id("e").Dot("ID")),
-			jen.If(jen.Id(ag.option.Variable).Dot("Evaluator").Call().Op("!=").Nil()).Block(jen.Id("ag").Dot("InsertByConfig").Call(jen.Id("tx"),
-				jen.Id(ag.option.Variable)),
+			jen.If(jen.Id(ag.option.Variable).Dot("Evaluator").Call().Op("!=").Nil()).Block(
+				jen.If(jen.Op("!").Id("ag").Dot("InsertByConfig").Call(jen.Id("tx"),
+					jen.Id(ag.option.Variable))).Block(jen.Return(jen.Nil())),
 				jen.Return().Id("ids")),
 			jen.Id("values").Op(":=").Id("make").Call(jen.Index().Id("any"),
 				jen.Lit(0)),
-			jen.Id("config").Op(":=").Add(helper.UseEntity(fmt.Sprintf("New%s", ag.option.Entity))).Call(),
+			jen.Id("config").Op(":=").Id(ag.option.Variable),
 			jen.List(jen.Id("selfishs"),
 				jen.Id("_")).Op(":=").Id(ag.option.Variable).Dot("ColumnAndValue").Call(jen.Id("fn")),
 			jen.For(jen.List(jen.Id("_"),
@@ -529,8 +531,8 @@ func (ag *autogen) GenFuncBatchInsertWithFunc() jen.Code {
 				Block(jen.Id("eval").Dot("Insert").Call(jen.Id("selfishs").Op("...")).
 					Dot("Into").Call(jen.Id("config").Dot("Table").Call()).
 					Dot("Values").Call(jen.Id("values").Op("...")).Dot("Eval").Call())),
-			jen.Id("ag").Dot("InsertByConfig").Call(jen.Id("tx"),
-				jen.Id("config")),
+			jen.If(jen.Op("!").Id("ag").Dot("InsertByConfig").Call(jen.Id("tx"),
+				jen.Id("config"))).Block(jen.Return(jen.Nil())),
 			jen.Return().Id("ids"))
 }
 
@@ -580,17 +582,20 @@ func (ag *autogen) GenFuncUpdateByIDWithFunc() jen.Code {
 	return ag.funcPrefix().Id("UpdateByIDWithFunc").Params(jen.Id("tx").Op("*").Add(helper.UseSQLTx()),
 		jen.Id(ag.option.Variable).Op("*").Add(helper.UseEntity(ag.option.Entity)),
 		jen.Id("fn").Func().Params(jen.Op("*").Id("iris").Dot("Column").Index(helper.UseEntity(ag.option.Entity)),
-			jen.Id("any")).Bool()).Bool().Block(jen.If(jen.Id(ag.option.Variable).Dot("Evaluator").Call().Op("!=").Nil()).
-		Block(jen.Return().Id("ag").Dot("UpdateByConfig").Call(jen.Id("tx"),
-			jen.Id(ag.option.Variable))),
-		jen.Id("config").Op(":=").Add(helper.UseEntity(fmt.Sprintf("New%s", ag.option.Entity))).Call(),
-		jen.List(jen.Id("selfishs"),
-			jen.Id("values")).Op(":=").Id(ag.option.Variable).Dot("ColumnAndValue").Call(jen.Id("fn")),
-		jen.Id("config").Dot("Configure").Call(jen.Func().Params(jen.Id("eval").Op("*").Id("iris").Dot("Evaluator").Index(helper.UseEntity(ag.option.Entity))).
-			Block(jen.Id("eval").Dot("UpdateRef").Call(jen.Id("config").Dot("Table").Call(),
-				jen.Id("selfishs").Op("...")).Dot("SetValues").Call(jen.Id("values").Op("...")).Dot("Eval").Call())),
-		jen.Return().Id("ag").Dot("UpdateByConfig").Call(jen.Id("tx"),
-			jen.Id("config")))
+			jen.Id("any")).Bool()).Bool().
+		Block(jen.If(jen.Id(ag.option.Variable).Dot("Evaluator").Call().Op("!=").Nil()).
+			Block(jen.Return().Id("ag").Dot("UpdateByConfig").Call(jen.Id("tx"), jen.Id(ag.option.Variable))),
+			jen.Id("id").Op(":=").Add(helper.RenderStarField(ag.option.Variable, "ID")),
+			jen.Id(ag.option.Variable).Dot("ID").Op("=").Nil(),
+			jen.Id("config").Op(":=").Id(ag.option.Variable),
+			jen.List(jen.Id("selfishs"),
+				jen.Id("values")).Op(":=").Id(ag.option.Variable).Dot("ColumnAndValue").Call(jen.Id("fn")),
+			jen.Id("config").Dot("Configure").Call(jen.Func().Params(jen.Id("eval").Op("*").Id("iris").Dot("Evaluator").Index(helper.UseEntity(ag.option.Entity))).
+				Block(jen.Id("eval").Dot("UpdateRef").Call(jen.Id("config").Dot("Table").Call(),
+					jen.Id("selfishs").Op("...")).Dot("SetValues").Call(jen.Id("values").Op("...")).
+					Dot("Where").Call(jen.Id("config").Dot("IDCol").Call().Dot("EQ").Call(jen.Id("id"))).Dot("Eval").Call())),
+			jen.Return().Id("ag").Dot("UpdateByConfig").Call(jen.Id("tx"),
+				jen.Id("config")))
 }
 
 func (ag *autogen) GenFuncBatchUpdateByIDWithFunc() jen.Code {
@@ -604,14 +609,12 @@ func (ag *autogen) GenFuncBatchUpdateByIDWithFunc() jen.Code {
 		jen.Return().Id("true"))
 }
 
-func (ag *autogen) GenFuncSelectXXXByYYYID() jen.Code {
+func (ag *autogen) GenFuncSelectShip(XXX, YYY *helper.Option) jen.Code {
 	if !ag.option.EnableShip {
 		return jen.Null()
 	}
-	XXX := ag.option.Left  // account
-	YYY := ag.option.Right // role
-	return ag.funcPrefix().Id(fmt.Sprintf("Select%sBy%sID", XXX.Entity, YYY.Entity)).
-		Params(jen.Id(fmt.Sprintf("%sID", YYY.Entity)).Id("int64")).
+	return ag.funcPrefix().Id(fmt.Sprintf("Select%sBy%sID", XXX.GetShipKey(), YYY.GetShipKey())).
+		Params(jen.Id(fmt.Sprintf("%sID", strcase.ToLowerCamel(YYY.GetShipKey()))).Id("int64")).
 		Params(jen.Index().Op("*").Id("entity").Dot(XXX.Entity)).
 		Block(
 			jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorderByCtx()),
@@ -632,7 +635,7 @@ func (ag *autogen) GenFuncSelectXXXByYYYID() jen.Code {
 						jen.Id("eval").Dot("Select").Call(jen.Id("leftConfig").Dot("Asterisk").Call(jen.Id("leftTable").Dot("Decorate")).Op("...")).
 							Dot("From").Call(jen.Id("leftTable").Dot("Ref").Call(jen.Id("shipTable"), jen.Id("rightTable"))).
 							Dot("Where").Call(jen.Id("shipConfig").Dot(fmt.Sprintf("%sIdCol", YYY.GetShipKey())).Call().Dot("Decorate").
-							Call(jen.Id("shipTable").Dot("Decorate")).Dot("EQ").Call(jen.Id(fmt.Sprintf("%sID", YYY.Entity)))).
+							Call(jen.Id("shipTable").Dot("Decorate")).Dot("EQ").Call(jen.Id(fmt.Sprintf("%sID", strcase.ToLowerCamel(YYY.GetShipKey()))))).
 							Dot("Eval").Call())), jen.Id("evalInfo").Op(":=").Id("leftConfig").Dot("Evaluator").Call().
 				Dot("EvalInfo").Call(), jen.If(jen.Id("evalInfo").Op("==").Id("nil")).
 				Block(jen.Return().Id("nil")), jen.Id("execSQL").Op(":=").Id("evalInfo").Dot("SQL").Call(),
@@ -640,7 +643,7 @@ func (ag *autogen) GenFuncSelectXXXByYYYID() jen.Code {
 			jen.Id("db").Op(":=").Id("database").Dot("FetchDB").Call(),
 			jen.List(jen.Id("stmt"), jen.Id("err")).Op(":=").Id("db").Dot("Prepare").Call(jen.Id("execSQL")),
 			jen.Id("recorder").Dot("MaybePanic").Call(jen.Id("err")), jen.Defer().Add(helper.UseHelper("DeferClose")).Call(jen.Id("stmt"), jen.Id("recorder").Dot("MaybePanic")),
-			jen.List(jen.Id("rows"), jen.Id("err")).Op(":=").Id("stmt").Dot("QueryContext").Call(jen.Id("nil"),
+			jen.List(jen.Id("rows"), jen.Id("err")).Op(":=").Id("stmt").Dot("QueryContext").Call(jen.Id("ag").Dot("getDBCtx").Call(),
 				jen.Id("values").Op("...")),
 			jen.Id("recorder").Dot("MaybePanic").Call(jen.Id("err")),
 			jen.Id(fmt.Sprintf("%ss", XXX.LowerCamel)).Op(":=").Add(helper.UseRows()).Call(jen.Id("rows"),
@@ -648,54 +651,31 @@ func (ag *autogen) GenFuncSelectXXXByYYYID() jen.Code {
 					jen.Index().Id("any")).Block(jen.Id(XXX.LowerCamel).Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", XXX.Entity)).Call(),
 					jen.Id("mappers").Op(":=").Id("evalInfo").Dot("MapperRows").Call(jen.Id(XXX.LowerCamel)),
 					jen.Return().List(jen.Id(XXX.LowerCamel), jen.Id("mappers")))), jen.Return().Id(fmt.Sprintf("%ss", XXX.LowerCamel)))
+}
+
+func (ag *autogen) GenFuncSelectXXXByYYYID() jen.Code {
+	if !ag.option.EnableShip {
+		return jen.Null()
+	}
+	return ag.GenFuncSelectShip(ag.option.Left, ag.option.Right)
 }
 
 func (ag *autogen) GenFuncSelectYYYByXXXID() jen.Code {
 	if !ag.option.EnableShip {
 		return jen.Null()
 	}
-	XXX := ag.option.Right // role
-	YYY := ag.option.Left  // account
-	return ag.funcPrefix().Id(fmt.Sprintf("Select%sBy%sID", XXX.Entity, YYY.Entity)).
-		Params(jen.Id(fmt.Sprintf("%sID", YYY.Entity)).Id("int64")).
-		Params(jen.Index().Op("*").Id("entity").Dot(XXX.Entity)).
-		Block(
-			jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorderByCtx()),
-			jen.Id("rightConfig").Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", YYY.Entity)).Call(),
-			jen.Id("shipConfig").Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", ag.option.Entity)).Call(),
-			jen.Id("leftConfig").Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", XXX.Entity)).Call(),
-			jen.Id("leftConfig").Dot("Configure").Call(
-				jen.Func().Params(jen.Id("eval").Op("*").Add(helper.UseIrisEvaluatorCode(helper.UseEntity(XXX.Entity)))).
-					Block(jen.Id("leftTable").Op(":=").Id("leftConfig").Dot("Table").Call(),
-						jen.Id("shipTable").Op(":=").Id("shipConfig").Dot("Table").Call(),
-						jen.Id("shipTable").Dot("LeftJoin").Call().Dot("OnEQ").Call(jen.Id("leftConfig").Dot("IDCol").
-							Call().Dot("Decorate").Call(jen.Id("leftTable").Dot("Decorate")),
-							jen.Id("shipConfig").Dot(fmt.Sprintf("%sIdCol", XXX.GetShipKey())).Call().Dot("Decorate").Call(jen.Id("shipTable").Dot("Decorate"))),
-						jen.Id("rightTable").Op(":=").Id("rightConfig").Dot("Table").Call(),
-						jen.Id("rightTable").Dot("LeftJoin").Call().Dot("OnEQ").Call(jen.Id("rightConfig").Dot("IDCol").
-							Call().Dot("Decorate").Call(jen.Id("rightTable").Dot("Decorate")),
-							jen.Id("shipConfig").Dot(fmt.Sprintf("%sIdCol", YYY.GetShipKey())).Call().Dot("Decorate").Call(jen.Id("shipTable").Dot("Decorate"))),
-						jen.Id("eval").Dot("Select").Call(jen.Id("leftConfig").Dot("Asterisk").Call(jen.Id("leftTable").Dot("Decorate")).Op("...")).
-							Dot("From").Call(jen.Id("leftTable").Dot("Ref").Call(jen.Id("shipTable"), jen.Id("rightTable"))).
-							Dot("Where").Call(jen.Id("shipConfig").Dot(fmt.Sprintf("%sIdCol", YYY.GetShipKey())).Call().Dot("Decorate").
-							Call(jen.Id("shipTable").Dot("Decorate")).Dot("EQ").Call(jen.Id(fmt.Sprintf("%sID", YYY.Entity)))).
-							Dot("Eval").Call())), jen.Id("evalInfo").Op(":=").Id("leftConfig").Dot("Evaluator").Call().
-				Dot("EvalInfo").Call(), jen.If(jen.Id("evalInfo").Op("==").Id("nil")).
-				Block(jen.Return().Id("nil")), jen.Id("execSQL").Op(":=").Id("evalInfo").Dot("SQL").Call(),
-			jen.Id("values").Op(":=").Id("evalInfo").Dot("Values").Call(),
-			jen.Id("db").Op(":=").Id("database").Dot("FetchDB").Call(),
-			jen.List(jen.Id("stmt"), jen.Id("err")).Op(":=").Id("db").Dot("Prepare").Call(jen.Id("execSQL")),
-			jen.Id("recorder").Dot("MaybePanic").Call(jen.Id("err")), jen.Defer().Add(helper.UseHelper("DeferClose")).Call(jen.Id("stmt"), jen.Id("recorder").Dot("MaybePanic")),
-			jen.List(jen.Id("rows"), jen.Id("err")).Op(":=").Id("stmt").Dot("QueryContext").Call(jen.Id("nil"),
-				jen.Id("values").Op("...")),
-			jen.Id("recorder").Dot("MaybePanic").Call(jen.Id("err")),
-			jen.Id(fmt.Sprintf("%ss", XXX.LowerCamel)).Op(":=").Add(helper.UseRows()).Call(jen.Id("rows"),
-				jen.Func().Params().Params(jen.Op("*").Id("entity").Dot(XXX.Entity),
-					jen.Index().Id("any")).Block(jen.Id(XXX.LowerCamel).Op(":=").Id("entity").Dot(fmt.Sprintf("New%s", XXX.Entity)).Call(),
-					jen.Id("mappers").Op(":=").Id("evalInfo").Dot("MapperRows").Call(jen.Id(XXX.LowerCamel)),
-					jen.Return().List(jen.Id(XXX.LowerCamel), jen.Id("mappers")))), jen.Return().Id(fmt.Sprintf("%ss", XXX.LowerCamel)))
+	return ag.GenFuncSelectShip(ag.option.Right, ag.option.Left)
 }
 
 func (ag *autogen) GenFuncGetDBCtx() jen.Code {
-	return ag.funcPrefix().Id("getDBCtx").Params().Params(helper.UseContextContext()).Block(jen.Return().Add(helper.UseContext("Background")).Call())
+	return ag.funcPrefix().Id("getDBCtx").
+		Params().Params(helper.UseContextContext()).
+		Block(
+			jen.If(jen.Id("ag").Dot("ctx").Op("==").Nil()).Block(jen.Return().Add(jen.Add(helper.UseContext("Background")).Call())),
+			jen.Return().Add(helper.UseContext("WithValue")).Call(
+				jen.Add(helper.UseContext("Background")).Call(),
+				jen.Add(helper.UseConstant("TraceIdKey")),
+				jen.Id("ag").Dot("ctx").Dot("GetString").Call(helper.UseConstant("TraceIdKey")),
+			),
+		)
 }

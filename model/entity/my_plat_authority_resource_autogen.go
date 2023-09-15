@@ -196,7 +196,7 @@ func (e *MyPlatAuthorityResource) LogicDelKey() *iris.Column[MyPlatAuthorityReso
 }
 
 // Evaluator 计算器
-func (e *MyPlatAuthorityResource) Evaluator() iris.EvalInfoService[MyPlatAuthorityResource] {
+func (e *MyPlatAuthorityResource) Evaluator() *iris.Evaluator[MyPlatAuthorityResource] {
 	if e == nil {
 		return nil
 	}

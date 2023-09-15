@@ -11,8 +11,8 @@ import (
 	"deepsea/helper/runerror"
 	"deepsea/helper/security"
 	"deepsea/model/reply"
-	platformService "deepsea/module/platform/service"
-	systemService "deepsea/module/system/service"
+	// platformService "deepsea/module/platform/service"
+	// systemService "deepsea/module/system/service"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -49,14 +49,14 @@ func CheckRBAC(chain ...RbacHandler) gin.HandlerFunc {
 		id := security.GetAccountID(ctx)
 		recorder.Info(fmt.Sprintf("检测 ID: %d 的相关 RBAC 信息", id))
 
-		roleSvc, roleRel := platformService.NewPlatRoleSvc(ctx)
-		defer roleRel()
-
-		permSvc, permRel := platformService.NewPlatAuthoritySvc(ctx)
-		defer permRel()
-
-		security.LookupRole(ctx, roleSvc)
-		security.LookupPerm(ctx, permSvc)
+		// roleSvc, roleRel := platformService.NewPlatRoleSvc(ctx)
+		// defer roleRel()
+		//
+		// permSvc, permRel := platformService.NewPlatAuthoritySvc(ctx)
+		// defer permRel()
+		//
+		// security.LookupRole(ctx, roleSvc)
+		// security.LookupPerm(ctx, permSvc)
 
 		var fail = false
 		for _, handler := range chain {
@@ -88,8 +88,8 @@ func Limiter() gin.HandlerFunc {
 }
 
 func RegisterLogger() gin.HandlerFunc {
-	svc, _ := systemService.NewSysLogSvc(nil)
-	svc.Persistence()
+	// svc, _ := systemService.NewSysLogSvc(nil)
+	// svc.Persistence()
 
 	signSupplier := func(ctx *gin.Context) string {
 		ip := ctx.ClientIP()

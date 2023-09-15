@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"deepsea/config/constant"
 	"deepsea/helper"
 	"deepsea/helper/database"
 	"deepsea/helper/recorderx"
@@ -54,11 +55,11 @@ type iMyPlatAuthorityResourceAutoGen interface {
 	// SelectByTenantID Query by Tenant ID
 	SelectByTenantID(int64) []*entity.MyPlatAuthorityResource
 
-	// SelectMyPlatAuthorityByMyPlatResourceID Query MyPlatAuthority by MyPlatResource ID
-	SelectMyPlatAuthorityByMyPlatResourceID(int64) []*entity.MyPlatAuthority
+	// SelectAuthorityByResourceID Query Authority by Resource ID
+	SelectAuthorityByResourceID(int64) []*entity.MyPlatAuthority
 
-	// SelectMyPlatResourceByMyPlatAuthorityID Query MyPlatResource by MyPlatAuthority ID
-	SelectMyPlatResourceByMyPlatAuthorityID(int64) []*entity.MyPlatResource
+	// SelectResourceByAuthorityID Query Resource by Authority ID
+	SelectResourceByAuthorityID(int64) []*entity.MyPlatResource
 
 	// SelectAllWithPage Query all entries by page
 	SelectAllWithPage(int64, int64) ([]*entity.MyPlatAuthorityResource, int64)
@@ -109,11 +110,11 @@ type myPlatAuthorityResourceAutoGen struct {
 }
 
 func (ag *myPlatAuthorityResourceAutoGen) SelectOneByConfig(config iris.ConfigService[entity.MyPlatAuthorityResource]) *entity.MyPlatAuthorityResource {
-	if config != nil {
+	if config == nil {
 		return nil
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return nil
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -134,11 +135,11 @@ func (ag *myPlatAuthorityResourceAutoGen) SelectOneByConfig(config iris.ConfigSe
 }
 
 func (ag *myPlatAuthorityResourceAutoGen) SelectManyByConfig(config iris.ConfigService[entity.MyPlatAuthorityResource]) []*entity.MyPlatAuthorityResource {
-	if config != nil {
+	if config == nil {
 		return nil
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return nil
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -160,11 +161,11 @@ func (ag *myPlatAuthorityResourceAutoGen) SelectManyByConfig(config iris.ConfigS
 }
 
 func (ag *myPlatAuthorityResourceAutoGen) SelectPageByConfig(config iris.ConfigService[entity.MyPlatAuthorityResource]) ([]*entity.MyPlatAuthorityResource, int64) {
-	if config != nil {
+	if config == nil {
 		return nil, 0
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return nil, 0
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -189,7 +190,7 @@ func (ag *myPlatAuthorityResourceAutoGen) SelectPageByConfig(config iris.ConfigS
 		stmt, err := tx.Prepare(totalSQL)
 		defer helper.DeferClose(stmt, recorder.MaybePanic)
 		recorder.MaybePanic(err)
-		row := stmt.QueryRowContext(ag.getDBCtx(), values...)
+		row := stmt.QueryRowContext(ag.getDBCtx(), values[:len(values)-2]...)
 		total := helper.Row(row, func() (**int64, []any) {
 			var r *int64
 			var cs = []any{&r}
@@ -204,11 +205,11 @@ func (ag *myPlatAuthorityResourceAutoGen) SelectPageByConfig(config iris.ConfigS
 }
 
 func (ag *myPlatAuthorityResourceAutoGen) InsertByConfig(tx *sql.Tx, config iris.ConfigService[entity.MyPlatAuthorityResource]) bool {
-	if config != nil {
+	if config == nil {
 		return false
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return false
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -234,11 +235,11 @@ func (ag *myPlatAuthorityResourceAutoGen) InsertByConfig(tx *sql.Tx, config iris
 }
 
 func (ag *myPlatAuthorityResourceAutoGen) UpdateByConfig(tx *sql.Tx, config iris.ConfigService[entity.MyPlatAuthorityResource]) bool {
-	if config != nil {
+	if config == nil {
 		return false
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return false
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -256,11 +257,11 @@ func (ag *myPlatAuthorityResourceAutoGen) UpdateByConfig(tx *sql.Tx, config iris
 }
 
 func (ag *myPlatAuthorityResourceAutoGen) DeleteByConfig(tx *sql.Tx, config iris.ConfigService[entity.MyPlatAuthorityResource]) bool {
-	if config != nil {
+	if config == nil {
 		return false
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return false
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -333,7 +334,7 @@ func (ag *myPlatAuthorityResourceAutoGen) SelectByTenantID(id int64) []*entity.M
 	return ag.SelectManyByConfig(config)
 }
 
-func (ag *myPlatAuthorityResourceAutoGen) SelectMyPlatAuthorityByMyPlatResourceID(MyPlatResourceID int64) []*entity.MyPlatAuthority {
+func (ag *myPlatAuthorityResourceAutoGen) SelectAuthorityByResourceID(resourceID int64) []*entity.MyPlatAuthority {
 	recorder := recorderx.FetchRecorder(ag.ctx)
 	rightConfig := entity.NewMyPlatResource()
 	shipConfig := entity.NewMyPlatAuthorityResource()
@@ -344,7 +345,7 @@ func (ag *myPlatAuthorityResourceAutoGen) SelectMyPlatAuthorityByMyPlatResourceI
 		shipTable.LeftJoin().OnEQ(leftConfig.IDCol().Decorate(leftTable.Decorate), shipConfig.AuthorityIdCol().Decorate(shipTable.Decorate))
 		rightTable := rightConfig.Table()
 		rightTable.LeftJoin().OnEQ(rightConfig.IDCol().Decorate(rightTable.Decorate), shipConfig.ResourceIdCol().Decorate(shipTable.Decorate))
-		eval.Select(leftConfig.Asterisk(leftTable.Decorate)...).From(leftTable.Ref(shipTable, rightTable)).Where(shipConfig.ResourceIdCol().Decorate(shipTable.Decorate).EQ(MyPlatResourceID)).Eval()
+		eval.Select(leftConfig.Asterisk(leftTable.Decorate)...).From(leftTable.Ref(shipTable, rightTable)).Where(shipConfig.ResourceIdCol().Decorate(shipTable.Decorate).EQ(resourceID)).Eval()
 	})
 	evalInfo := leftConfig.Evaluator().EvalInfo()
 	if evalInfo == nil {
@@ -356,7 +357,7 @@ func (ag *myPlatAuthorityResourceAutoGen) SelectMyPlatAuthorityByMyPlatResourceI
 	stmt, err := db.Prepare(execSQL)
 	recorder.MaybePanic(err)
 	defer helper.DeferClose(stmt, recorder.MaybePanic)
-	rows, err := stmt.QueryContext(nil, values...)
+	rows, err := stmt.QueryContext(ag.getDBCtx(), values...)
 	recorder.MaybePanic(err)
 	myPlatAuthoritys := helper.Rows(rows, func() (*entity.MyPlatAuthority, []any) {
 		myPlatAuthority := entity.NewMyPlatAuthority()
@@ -366,7 +367,7 @@ func (ag *myPlatAuthorityResourceAutoGen) SelectMyPlatAuthorityByMyPlatResourceI
 	return myPlatAuthoritys
 }
 
-func (ag *myPlatAuthorityResourceAutoGen) SelectMyPlatResourceByMyPlatAuthorityID(MyPlatAuthorityID int64) []*entity.MyPlatResource {
+func (ag *myPlatAuthorityResourceAutoGen) SelectResourceByAuthorityID(authorityID int64) []*entity.MyPlatResource {
 	recorder := recorderx.FetchRecorder(ag.ctx)
 	rightConfig := entity.NewMyPlatAuthority()
 	shipConfig := entity.NewMyPlatAuthorityResource()
@@ -377,7 +378,7 @@ func (ag *myPlatAuthorityResourceAutoGen) SelectMyPlatResourceByMyPlatAuthorityI
 		shipTable.LeftJoin().OnEQ(leftConfig.IDCol().Decorate(leftTable.Decorate), shipConfig.ResourceIdCol().Decorate(shipTable.Decorate))
 		rightTable := rightConfig.Table()
 		rightTable.LeftJoin().OnEQ(rightConfig.IDCol().Decorate(rightTable.Decorate), shipConfig.AuthorityIdCol().Decorate(shipTable.Decorate))
-		eval.Select(leftConfig.Asterisk(leftTable.Decorate)...).From(leftTable.Ref(shipTable, rightTable)).Where(shipConfig.AuthorityIdCol().Decorate(shipTable.Decorate).EQ(MyPlatAuthorityID)).Eval()
+		eval.Select(leftConfig.Asterisk(leftTable.Decorate)...).From(leftTable.Ref(shipTable, rightTable)).Where(shipConfig.AuthorityIdCol().Decorate(shipTable.Decorate).EQ(authorityID)).Eval()
 	})
 	evalInfo := leftConfig.Evaluator().EvalInfo()
 	if evalInfo == nil {
@@ -389,7 +390,7 @@ func (ag *myPlatAuthorityResourceAutoGen) SelectMyPlatResourceByMyPlatAuthorityI
 	stmt, err := db.Prepare(execSQL)
 	recorder.MaybePanic(err)
 	defer helper.DeferClose(stmt, recorder.MaybePanic)
-	rows, err := stmt.QueryContext(nil, values...)
+	rows, err := stmt.QueryContext(ag.getDBCtx(), values...)
 	recorder.MaybePanic(err)
 	myPlatResources := helper.Rows(rows, func() (*entity.MyPlatResource, []any) {
 		myPlatResource := entity.NewMyPlatResource()
@@ -424,15 +425,19 @@ func (ag *myPlatAuthorityResourceAutoGen) InsertNonNil(tx *sql.Tx, eto *entity.M
 
 func (ag *myPlatAuthorityResourceAutoGen) InsertWithFunc(tx *sql.Tx, eto *entity.MyPlatAuthorityResource, fn func(*iris.Column[entity.MyPlatAuthorityResource], any) bool) int64 {
 	if eto.Evaluator() != nil {
-		ag.InsertByConfig(tx, eto)
+		if !ag.InsertByConfig(tx, eto) {
+			return 0
+		}
 		return *eto.ID
 	}
-	config := entity.NewMyPlatAuthorityResource()
+	config := eto
 	selfishs, values := eto.ColumnAndValue(fn)
 	config.Configure(func(eval *iris.Evaluator[entity.MyPlatAuthorityResource]) {
 		eval.Insert(selfishs...).Into(config.Table()).Values(values...).Eval()
 	})
-	ag.InsertByConfig(tx, config)
+	if !ag.InsertByConfig(tx, config) {
+		return 0
+	}
 	return *config.ID
 }
 
@@ -458,11 +463,13 @@ func (ag *myPlatAuthorityResourceAutoGen) BatchInsertWithFunc(tx *sql.Tx, ets []
 		ids[i] = *e.ID
 	}
 	if eto.Evaluator() != nil {
-		ag.InsertByConfig(tx, eto)
+		if !ag.InsertByConfig(tx, eto) {
+			return nil
+		}
 		return ids
 	}
 	values := make([]any, 0)
-	config := entity.NewMyPlatAuthorityResource()
+	config := eto
 	selfishs, _ := eto.ColumnAndValue(fn)
 	for _, e := range ets {
 		_, snipValues := e.ColumnAndValue(fn)
@@ -471,7 +478,9 @@ func (ag *myPlatAuthorityResourceAutoGen) BatchInsertWithFunc(tx *sql.Tx, ets []
 	config.Configure(func(eval *iris.Evaluator[entity.MyPlatAuthorityResource]) {
 		eval.Insert(selfishs...).Into(config.Table()).Values(values...).Eval()
 	})
-	ag.InsertByConfig(tx, config)
+	if !ag.InsertByConfig(tx, config) {
+		return nil
+	}
 	return ids
 }
 
@@ -511,10 +520,12 @@ func (ag *myPlatAuthorityResourceAutoGen) UpdateByIDWithFunc(tx *sql.Tx, eto *en
 	if eto.Evaluator() != nil {
 		return ag.UpdateByConfig(tx, eto)
 	}
-	config := entity.NewMyPlatAuthorityResource()
+	id := *eto.ID
+	eto.ID = nil
+	config := eto
 	selfishs, values := eto.ColumnAndValue(fn)
 	config.Configure(func(eval *iris.Evaluator[entity.MyPlatAuthorityResource]) {
-		eval.UpdateRef(config.Table(), selfishs...).SetValues(values...).Eval()
+		eval.UpdateRef(config.Table(), selfishs...).SetValues(values...).Where(config.IDCol().EQ(id)).Eval()
 	})
 	return ag.UpdateByConfig(tx, config)
 }
@@ -527,5 +538,8 @@ func (ag *myPlatAuthorityResourceAutoGen) BatchUpdateByIDWithFunc(tx *sql.Tx, et
 }
 
 func (ag *myPlatAuthorityResourceAutoGen) getDBCtx() context.Context {
-	return context.Background()
+	if ag.ctx == nil {
+		return context.Background()
+	}
+	return context.WithValue(context.Background(), constant.TraceIdKey, ag.ctx.GetString(constant.TraceIdKey))
 }

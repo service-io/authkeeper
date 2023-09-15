@@ -43,7 +43,10 @@ func HandleRollback(err error, tx *sql.Tx, eh func(...error)) {
 func ErrToLog(logger recorderx.Recorder) func(...error) {
 	return func(errs ...error) {
 		for _, err := range errs {
-			logger.WithOptions(recorderx.AddCallerSkip(1)).Error(err.Error())
+			if err != nil {
+				logger.WithOptions(recorderx.AddCallerSkip(1)).Error(err.Error())
+				panic(err)
+			}
 		}
 	}
 }
@@ -51,8 +54,10 @@ func ErrToLog(logger recorderx.Recorder) func(...error) {
 func ErrToLogAndPanic(logger recorderx.Recorder) func(...error) {
 	return func(errs ...error) {
 		for _, err := range errs {
-			logger.WithOptions(recorderx.AddCallerSkip(1)).Error(err.Error())
-			panic(err)
+			if err != nil {
+				logger.WithOptions(recorderx.AddCallerSkip(1)).Error(err.Error())
+				panic(err)
+			}
 		}
 	}
 }

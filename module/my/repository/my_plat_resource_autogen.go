@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"deepsea/config/constant"
 	"deepsea/helper"
 	"deepsea/helper/database"
 	"deepsea/helper/recorderx"
@@ -115,11 +116,11 @@ type myPlatResourceAutoGen struct {
 }
 
 func (ag *myPlatResourceAutoGen) SelectOneByConfig(config iris.ConfigService[entity.MyPlatResource]) *entity.MyPlatResource {
-	if config != nil {
+	if config == nil {
 		return nil
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return nil
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -140,11 +141,11 @@ func (ag *myPlatResourceAutoGen) SelectOneByConfig(config iris.ConfigService[ent
 }
 
 func (ag *myPlatResourceAutoGen) SelectManyByConfig(config iris.ConfigService[entity.MyPlatResource]) []*entity.MyPlatResource {
-	if config != nil {
+	if config == nil {
 		return nil
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return nil
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -166,11 +167,11 @@ func (ag *myPlatResourceAutoGen) SelectManyByConfig(config iris.ConfigService[en
 }
 
 func (ag *myPlatResourceAutoGen) SelectPageByConfig(config iris.ConfigService[entity.MyPlatResource]) ([]*entity.MyPlatResource, int64) {
-	if config != nil {
+	if config == nil {
 		return nil, 0
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return nil, 0
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -195,7 +196,7 @@ func (ag *myPlatResourceAutoGen) SelectPageByConfig(config iris.ConfigService[en
 		stmt, err := tx.Prepare(totalSQL)
 		defer helper.DeferClose(stmt, recorder.MaybePanic)
 		recorder.MaybePanic(err)
-		row := stmt.QueryRowContext(ag.getDBCtx(), values...)
+		row := stmt.QueryRowContext(ag.getDBCtx(), values[:len(values)-2]...)
 		total := helper.Row(row, func() (**int64, []any) {
 			var r *int64
 			var cs = []any{&r}
@@ -210,11 +211,11 @@ func (ag *myPlatResourceAutoGen) SelectPageByConfig(config iris.ConfigService[en
 }
 
 func (ag *myPlatResourceAutoGen) InsertByConfig(tx *sql.Tx, config iris.ConfigService[entity.MyPlatResource]) bool {
-	if config != nil {
+	if config == nil {
 		return false
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return false
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -240,11 +241,11 @@ func (ag *myPlatResourceAutoGen) InsertByConfig(tx *sql.Tx, config iris.ConfigSe
 }
 
 func (ag *myPlatResourceAutoGen) UpdateByConfig(tx *sql.Tx, config iris.ConfigService[entity.MyPlatResource]) bool {
-	if config != nil {
+	if config == nil {
 		return false
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return false
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -262,11 +263,11 @@ func (ag *myPlatResourceAutoGen) UpdateByConfig(tx *sql.Tx, config iris.ConfigSe
 }
 
 func (ag *myPlatResourceAutoGen) DeleteByConfig(tx *sql.Tx, config iris.ConfigService[entity.MyPlatResource]) bool {
-	if config != nil {
+	if config == nil {
 		return false
 	}
 	evaluator := config.Evaluator()
-	if evaluator != nil {
+	if evaluator == nil {
 		return false
 	}
 	recorder := recorderx.FetchRecorder(ag.ctx)
@@ -396,15 +397,19 @@ func (ag *myPlatResourceAutoGen) InsertNonNil(tx *sql.Tx, eto *entity.MyPlatReso
 
 func (ag *myPlatResourceAutoGen) InsertWithFunc(tx *sql.Tx, eto *entity.MyPlatResource, fn func(*iris.Column[entity.MyPlatResource], any) bool) int64 {
 	if eto.Evaluator() != nil {
-		ag.InsertByConfig(tx, eto)
+		if !ag.InsertByConfig(tx, eto) {
+			return 0
+		}
 		return *eto.ID
 	}
-	config := entity.NewMyPlatResource()
+	config := eto
 	selfishs, values := eto.ColumnAndValue(fn)
 	config.Configure(func(eval *iris.Evaluator[entity.MyPlatResource]) {
 		eval.Insert(selfishs...).Into(config.Table()).Values(values...).Eval()
 	})
-	ag.InsertByConfig(tx, config)
+	if !ag.InsertByConfig(tx, config) {
+		return 0
+	}
 	return *config.ID
 }
 
@@ -430,11 +435,13 @@ func (ag *myPlatResourceAutoGen) BatchInsertWithFunc(tx *sql.Tx, ets []*entity.M
 		ids[i] = *e.ID
 	}
 	if eto.Evaluator() != nil {
-		ag.InsertByConfig(tx, eto)
+		if !ag.InsertByConfig(tx, eto) {
+			return nil
+		}
 		return ids
 	}
 	values := make([]any, 0)
-	config := entity.NewMyPlatResource()
+	config := eto
 	selfishs, _ := eto.ColumnAndValue(fn)
 	for _, e := range ets {
 		_, snipValues := e.ColumnAndValue(fn)
@@ -443,7 +450,9 @@ func (ag *myPlatResourceAutoGen) BatchInsertWithFunc(tx *sql.Tx, ets []*entity.M
 	config.Configure(func(eval *iris.Evaluator[entity.MyPlatResource]) {
 		eval.Insert(selfishs...).Into(config.Table()).Values(values...).Eval()
 	})
-	ag.InsertByConfig(tx, config)
+	if !ag.InsertByConfig(tx, config) {
+		return nil
+	}
 	return ids
 }
 
@@ -483,10 +492,12 @@ func (ag *myPlatResourceAutoGen) UpdateByIDWithFunc(tx *sql.Tx, eto *entity.MyPl
 	if eto.Evaluator() != nil {
 		return ag.UpdateByConfig(tx, eto)
 	}
-	config := entity.NewMyPlatResource()
+	id := *eto.ID
+	eto.ID = nil
+	config := eto
 	selfishs, values := eto.ColumnAndValue(fn)
 	config.Configure(func(eval *iris.Evaluator[entity.MyPlatResource]) {
-		eval.UpdateRef(config.Table(), selfishs...).SetValues(values...).Eval()
+		eval.UpdateRef(config.Table(), selfishs...).SetValues(values...).Where(config.IDCol().EQ(id)).Eval()
 	})
 	return ag.UpdateByConfig(tx, config)
 }
@@ -499,5 +510,8 @@ func (ag *myPlatResourceAutoGen) BatchUpdateByIDWithFunc(tx *sql.Tx, ets []*enti
 }
 
 func (ag *myPlatResourceAutoGen) getDBCtx() context.Context {
-	return context.Background()
+	if ag.ctx == nil {
+		return context.Background()
+	}
+	return context.WithValue(context.Background(), constant.TraceIdKey, ag.ctx.GetString(constant.TraceIdKey))
 }

@@ -5,7 +5,6 @@
 package router
 
 import (
-	"deepsea/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,16 +20,16 @@ func getV1Router(handlers ...gin.HandlerFunc) *gin.RouterGroup {
 }
 
 func setApiRouter() {
-	// 匿名(无需认证) api
-	setAnonymousApi(getCurrentVersionRouter())
-	// 公共 api
-	setCommonApi(getCurrentVersionRouter(middleware.CheckAuth(middleware.NewTokenAuth())))
-	// 平台 api
-	setPlatformApi(getCurrentVersionRouter(middleware.CheckAuth(middleware.NewTokenAuth())))
-	// 用户(实名) api
-	setUserApi(getCurrentVersionRouter(middleware.CheckAuth(middleware.NewTokenAuth())))
-	// 租户 api
-	setTenantApi(getCurrentVersionRouter(middleware.CheckAuth(middleware.NewTokenAuth())))
-	// 系统 api
-	setSystemApi(getCurrentVersionRouter(middleware.CheckAuth(middleware.NewTokenAuth())))
+	// // 匿名(无需认证) api
+	// setAnonymousApi(getCurrentVersionRouter())
+	// // 公共 api
+	// setCommonApi(getCurrentVersionRouter(middleware.CheckAuth(middleware.NewTokenAuth())))
+	// // 平台 api
+	// setPlatformApi(getCurrentVersionRouter(middleware.CheckAuth(middleware.NewTokenAuth())))
+	// // 用户(实名) api
+	// setUserApi(getCurrentVersionRouter(middleware.CheckAuth(middleware.NewTokenAuth())))
+	// // 租户 api
+	// setTenantApi(getCurrentVersionRouter(middleware.CheckAuth(middleware.NewTokenAuth())))
+	// // 系统 api
+	// setSystemApi(getCurrentVersionRouter(middleware.CheckAuth(middleware.NewTokenAuth())))
 }

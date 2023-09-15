@@ -7,7 +7,6 @@ package redisx
 import (
 	"context"
 	"deepsea/config/constant"
-	"deepsea/helper"
 	"deepsea/helper/concurrency"
 	"deepsea/helper/recorderx"
 	"deepsea/helper/runerror"
@@ -26,7 +25,7 @@ type redisXLocker struct {
 	key      string
 	ctx      context.Context
 	lock     *redislock.Lock
-	recorder func(err error)
+	recorder func(errs ...error)
 }
 
 func NewRedisLocker(recorder recorderx.Recorder) IRedisXLocker {
@@ -34,7 +33,7 @@ func NewRedisLocker(recorder recorderx.Recorder) IRedisXLocker {
 		logger := &redisLogger{recorder}
 		redis.SetLogger(logger)
 	}
-	return &redisXLocker{recorder: helper.ErrToLogAndPanic(recorder)}
+	return &redisXLocker{recorder: recorder.MaybePanic}
 }
 
 func (rec *redisXLocker) Lock(key string) {

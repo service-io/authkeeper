@@ -7,7 +7,6 @@ package redisx
 import (
 	"context"
 	"deepsea/config/constant"
-	"deepsea/helper"
 	"deepsea/helper/recorderx"
 	"fmt"
 	"github.com/redis/go-redis/v9"
@@ -50,7 +49,7 @@ type IRedisXEmitter interface {
 type redisXEmitter struct {
 	client   redis.UniversalClient
 	timeout  time.Duration
-	recorder func(err error)
+	recorder func(errs ...error)
 }
 
 func NewRedisEmitter(recorder recorderx.Recorder) (IRedisXEmitter, func()) {
@@ -58,15 +57,17 @@ func NewRedisEmitter(recorder recorderx.Recorder) (IRedisXEmitter, func()) {
 }
 
 func NewRedisEmitterWithTimeout(timeout time.Duration, recorder recorderx.Recorder) (IRedisXEmitter, func()) {
-	var errorHandler = func(err error) {
-		if err != nil {
-			panic(err)
+	var errorHandler = func(errs ...error) {
+		for _, err := range errs {
+			if errs != nil {
+				panic(err)
+			}
 		}
 	}
 	if recorder != nil {
 		logger := &redisLogger{recorder}
 		redis.SetLogger(logger)
-		errorHandler = helper.ErrToLog(recorder)
+		errorHandler = recorder.MaybePanic
 	}
 
 	emitter := redisXEmitterPool.Get().(*redisXEmitter)

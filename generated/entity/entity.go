@@ -163,7 +163,7 @@ func (ag *autogen) GenFuncLogicDelKey() jen.Code {
 
 func (ag *autogen) GenFuncEvaluator() jen.Code {
 	return jen.Line().Comment("Evaluator 计算器").Line().
-		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("Evaluator").Params().Params(jen.Add(helper.UseIris("EvalInfoService")).Types(jen.Id(ag.option.Entity))).
+		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("Evaluator").Params().Params(jen.Op("*").Add(helper.UseIris("Evaluator")).Types(jen.Id(ag.option.Entity))).
 		Block(
 			jen.If(jen.Id("e").Op("==").Nil()).Block(jen.Return(jen.Nil())),
 			jen.Return(jen.Id("e").Dot("evaluator")),

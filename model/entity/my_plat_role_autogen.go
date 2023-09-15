@@ -210,7 +210,7 @@ func (e *MyPlatRole) LogicDelKey() *iris.Column[MyPlatRole] {
 }
 
 // Evaluator 计算器
-func (e *MyPlatRole) Evaluator() iris.EvalInfoService[MyPlatRole] {
+func (e *MyPlatRole) Evaluator() *iris.Evaluator[MyPlatRole] {
 	if e == nil {
 		return nil
 	}

@@ -12,7 +12,7 @@ type EvalInfoService[T any] interface {
 type ConfigService[T any] interface {
 	ColumnAndValue(fns ...func(*Column[T], any) bool) (selfishs []Selfish, values []any)
 	Configure(func(*Evaluator[T]))
-	Evaluator() EvalInfoService[T]
+	Evaluator() *Evaluator[T]
 	Asterisk(fns ...func(string) string) []*Column[T]
 	PKey() *Column[T]
 	LogicDelKey() *Column[T]

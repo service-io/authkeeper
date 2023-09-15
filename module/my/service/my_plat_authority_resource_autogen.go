@@ -29,6 +29,12 @@ type iMyPlatAuthorityResourceAutoGen interface {
 	Modify(myPlatAuthorityResource *dto.MyPlatAuthorityResource) bool
 	Find(id int64) *dto.MyPlatAuthorityResource
 	FindWithPage(query page.Query) *page.Result
+
+	// FindAuthorityByResourceID Query Authority by Resource ID
+	FindAuthorityByResourceID(int64) []*dto.MyPlatAuthority
+
+	// FindResourceByAuthorityID Query Resource by Authority ID
+	FindResourceByAuthorityID(int64) []*dto.MyPlatResource
 }
 
 // myPlatAuthorityResourceAutoGen 服务接口
@@ -125,4 +131,42 @@ func (svc *myPlatAuthorityResourceAutoGen) FindWithPage(query page.Query) *page.
 		return nil
 	}
 	return page.NewResult(myPlatAuthorityResources, total)
+}
+
+// FindAuthorityByResourceID 根据 Resource ID 查询Authority详情
+func (svc *myPlatAuthorityResourceAutoGen) FindAuthorityByResourceID(id int64) []*dto.MyPlatAuthority {
+	recorder := recorderx.FetchRecorder(svc.ctx)
+	recorder.Infof("查询 Resource ID: %+v 的数据", id)
+	rty, release := repository.NewMyPlatAuthorityResourceRty(svc.ctx)
+	defer release()
+	ets := rty.SelectAuthorityByResourceID(id)
+	if ets == nil {
+		return nil
+	}
+	values := make([]*dto.MyPlatAuthority, len(ets))
+	for i, eto := range ets {
+		value := dto.NewMyPlatAuthority()
+		value.From(eto)
+		values[i] = value
+	}
+	return values
+}
+
+// FindResourceByAuthorityID 根据 Authority ID 查询Resource详情
+func (svc *myPlatAuthorityResourceAutoGen) FindResourceByAuthorityID(id int64) []*dto.MyPlatResource {
+	recorder := recorderx.FetchRecorder(svc.ctx)
+	recorder.Infof("查询 Authority ID: %+v 的数据", id)
+	rty, release := repository.NewMyPlatAuthorityResourceRty(svc.ctx)
+	defer release()
+	ets := rty.SelectResourceByAuthorityID(id)
+	if ets == nil {
+		return nil
+	}
+	values := make([]*dto.MyPlatResource, len(ets))
+	for i, eto := range ets {
+		value := dto.NewMyPlatResource()
+		value.From(eto)
+		values[i] = value
+	}
+	return values
 }

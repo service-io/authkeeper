@@ -33,6 +33,8 @@ func (ag *autogen) RenderAuto() {
 	file.Add(ag.GenFuncModify())
 	file.Add(ag.GenFuncFind())
 	file.Add(ag.GenFuncFindWithPage())
+	file.Add(ag.GenFuncFindXXXByYYYID())
+	file.Add(ag.GenFuncFindYYYByXXXID())
 
 	helper.WriteToFile(file, fmt.Sprintf("%s/%s_autogen.go", ag.option.Package.Svc, ag.option.Table), false)
 }
@@ -60,6 +62,19 @@ func (ag *autogen) RenderBoth() {
 }
 
 func (ag *autogen) GenInterfaceAutoGen() jen.Code {
+	var shipCodes []jen.Code
+
+	if ag.option.EnableShip {
+		XXX := ag.option.Left  // account
+		YYY := ag.option.Right // role
+		xCode := jen.Line().Line().Comment(fmt.Sprintf("Find%sBy%sID Query %s by %s ID", XXX.GetShipKey(), YYY.GetShipKey(), XXX.GetShipKey(), YYY.GetShipKey())).
+			Line().Id(fmt.Sprintf("Find%sBy%sID", XXX.GetShipKey(), YYY.GetShipKey())).Params(jen.Int64()).Params(jen.Index().Op("*").Add(helper.UseDto(XXX.Entity)))
+		yCode := jen.Line().Line().Comment(fmt.Sprintf("Find%sBy%sID Query %s by %s ID", YYY.GetShipKey(), XXX.GetShipKey(), YYY.GetShipKey(), XXX.GetShipKey())).
+			Line().Id(fmt.Sprintf("Find%sBy%sID", YYY.GetShipKey(), XXX.GetShipKey())).Params(jen.Int64()).Params(jen.Index().Op("*").Add(helper.UseDto(YYY.Entity)))
+
+		shipCodes = append(shipCodes, xCode, yCode)
+	}
+
 	return jen.Line().Comment(fmt.Sprintf("i%sAutoGen 服务接口", ag.option.Entity)).Line().Type().Id(fmt.Sprintf("i%sAutoGen", ag.option.Entity)).Interface(
 		helper.UseValidatorIValidator(ag.option.Entity),
 		jen.Id("Add").
@@ -76,7 +91,9 @@ func (ag *autogen) GenInterfaceAutoGen() jen.Code {
 			Params(jen.Op("*").Add(helper.UseDto(ag.option.Entity))),
 		jen.Id("FindWithPage").
 			Params(jen.Id("query").Add(helper.UsePage("Query"))).
-			Params(jen.Op("*").Add(helper.UsePage("Result"))))
+			Params(jen.Op("*").Add(helper.UsePage("Result"))),
+		jen.Add(shipCodes...),
+	)
 }
 
 func (ag *autogen) GenStructAutoGen() jen.Code {
@@ -295,6 +312,43 @@ func (ag *autogen) GenFuncFindWithPage() jen.Code {
 		helper.IsAccountTable(ag.option.Table, jen.Id(ag.option.LowerCamel+"s").Op("...")),
 		jen.Return().Id("page").Dot("NewResult").Call(jen.Id(ag.option.LowerCamel+"s"), jen.Id("total")),
 	)
+}
+
+func (ag *autogen) GenFuncSelectShip(XXX, YYY *helper.Option) jen.Code {
+	if !ag.option.EnableShip {
+		return jen.Null()
+	}
+	return jen.Line().Comment(fmt.Sprintf("Find%sBy%sID 根据 %s ID 查询%s详情", XXX.GetShipKey(), YYY.GetShipKey(), YYY.GetShipKey(), XXX.GetShipKey())).Line().Func().
+		Params(jen.Id("svc").Op("*").Id(fmt.Sprintf("%sAutoGen", ag.option.LowerCamel))).Id(fmt.Sprintf("Find%sBy%sID", XXX.GetShipKey(), YYY.GetShipKey())).
+		Params(jen.Id("id").Id("int64")).
+		Params(jen.Index().Op("*").Add(helper.UseDto(XXX.Entity))).
+		Block(
+			jen.Id("recorder").Op(":=").Add(helper.UseFetchRecorder()).Call(jen.Id("svc").Dot("ctx")),
+			jen.Id("recorder").Dot("Infof").Call(jen.Lit(fmt.Sprintf("查询 %s ID: %%+v 的数据", YYY.GetShipKey())), jen.Id("id")),
+			jen.List(jen.Id("rty"), jen.Id("release")).Op(":=").Id("repository").Dot(fmt.Sprintf("New%sRty", ag.option.Entity)).Call(jen.Id("svc").Dot("ctx")),
+			jen.Defer().Id("release").Call(),
+			jen.Id("ets").Op(":=").Id("rty").Dot(fmt.Sprintf("Select%sBy%sID", XXX.GetShipKey(), YYY.GetShipKey())).Call(jen.Id("id")),
+			jen.If(jen.Id("ets").Op("==").Id("nil")).Block(jen.Return().Id("nil")),
+			jen.Id("values").Op(":=").Id("make").Call(jen.Index().Op("*").Add(helper.UseDto(XXX.Entity)), jen.Id("len").Call(jen.Id("ets"))),
+			jen.For(jen.List(jen.Id("i"), jen.Id("eto")).Op(":=").Range().Id("ets")).Block(
+				jen.Id("value").Op(":=").Add(helper.UseDto(fmt.Sprintf("New%s", XXX.Entity))).Call(),
+				jen.Id("value").Dot("From").Call(jen.Id("eto")),
+				jen.Id("values").Index(jen.Id("i")).Op("=").Id("value")), jen.Return().Id("values"),
+		)
+}
+
+func (ag *autogen) GenFuncFindXXXByYYYID() jen.Code {
+	if !ag.option.EnableShip {
+		return jen.Null()
+	}
+	return ag.GenFuncSelectShip(ag.option.Left, ag.option.Right)
+}
+
+func (ag *autogen) GenFuncFindYYYByXXXID() jen.Code {
+	if !ag.option.EnableShip {
+		return jen.Null()
+	}
+	return ag.GenFuncSelectShip(ag.option.Right, ag.option.Left)
 }
 
 func (ag *autogen) GenVarPool() jen.Code {
