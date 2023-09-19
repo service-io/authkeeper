@@ -1,6 +1,6 @@
 module deepsea
 
-go 1.21
+go 1.21.0
 
 require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.62.522
@@ -60,6 +60,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
 	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
+	github.com/service-io/cellar v0.1.0 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

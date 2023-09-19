@@ -204,11 +204,11 @@ const (
 	helperPkg      = "deepsea/helper"
 	pagePkg        = "deepsea/model/page"
 	replyPkg       = "deepsea/model/reply"
-	irisPkg        = "deepsea/model/iris"
 	dtoPkg         = "deepsea/model/dto"
 	entityPkg      = "deepsea/model/entity"
 	repositoryPkg  = "deepsea/module/%s/repository"
 	servicePkg     = "deepsea/module/%s/service"
+	cellarPkg      = "github.com/service-io/cellar"
 )
 
 func ImportPkg(module string, f *jen.File) {
@@ -236,7 +236,7 @@ func ImportPkg(module string, f *jen.File) {
 	f.ImportName(entityPkg, "entity")
 	f.ImportName(pagePkg, "page")
 	f.ImportName(replyPkg, "reply")
-	f.ImportName(irisPkg, "iris")
+	f.ImportName(cellarPkg, "cellar")
 
 	f.ImportName(fmt.Sprintf(repositoryPkg, module), "repository")
 	f.ImportName(fmt.Sprintf(servicePkg, module), "service")
@@ -271,40 +271,40 @@ func use(path, name string) jen.Code {
 	return jen.Qual(path, name)
 }
 
-func UseIris(name string) jen.Code {
-	return use(irisPkg, name)
+func UseCellar(name string) jen.Code {
+	return use(cellarPkg, name)
 }
 
-func UseIrisColumn(name string) jen.Code {
-	return jen.Add(UseIris("Column")).Types(jen.Id(name))
+func UseCellarColumn(name string) jen.Code {
+	return jen.Add(UseCellar("Column")).Types(jen.Id(name))
 }
 
-func UseIrisColumnCode(types ...jen.Code) jen.Code {
-	return jen.Add(UseIris("Column")).Types(types...)
+func UseCellarColumnCode(types ...jen.Code) jen.Code {
+	return jen.Add(UseCellar("Column")).Types(types...)
 }
 
-func UseIrisRefTable() jen.Code {
-	return jen.Add(UseIris("RefTable"))
+func UseCellarRefTable() jen.Code {
+	return jen.Add(UseCellar("RefTable"))
 }
 
-func UseIrisEvaluator(name string) jen.Code {
-	return jen.Add(UseIris("Evaluator")).Types(jen.Id(name))
+func UseCellarEvaluator(name string) jen.Code {
+	return jen.Add(UseCellar("Evaluator")).Types(jen.Id(name))
 }
 
-func UseIrisEvaluatorCode(types ...jen.Code) jen.Code {
-	return jen.Add(UseIris("Evaluator")).Types(types...)
+func UseCellarEvaluatorCode(types ...jen.Code) jen.Code {
+	return jen.Add(UseCellar("Evaluator")).Types(types...)
 }
 
-func UseIrisConfigService(name string) jen.Code {
-	return jen.Add(UseIris("ConfigService")).Types(jen.Id(name))
+func UseCellarConfigService(name string) jen.Code {
+	return jen.Add(UseCellar("ConfigService")).Types(jen.Id(name))
 }
 
-func UseIrisConfigServiceCode(types ...jen.Code) jen.Code {
-	return jen.Add(UseIris("ConfigService")).Types(types...)
+func UseCellarConfigServiceCode(types ...jen.Code) jen.Code {
+	return jen.Add(UseCellar("ConfigService")).Types(types...)
 }
 
-func UseIrisNamedConfigServiceCode(types ...jen.Code) jen.Code {
-	return jen.Id("config").Add(UseIris("ConfigService")).Types(types...)
+func UseCellarNamedConfigServiceCode(types ...jen.Code) jen.Code {
+	return jen.Id("config").Add(UseCellar("ConfigService")).Types(types...)
 }
 
 func UseSQL(name string) jen.Code {
@@ -410,6 +410,22 @@ func IsAccountTable(table string, code jen.Code) jen.Code {
 
 func UseSecurity(name string) jen.Code {
 	return use(securityPkg, name)
+}
+
+func UseGetTenantID() jen.Code {
+	return jen.Add(UseSecurity("GetTenantID")).Call(jen.Id("ag").Dot("ctx"))
+}
+
+func UseGetAccountID() jen.Code {
+	return jen.Add(UseSecurity("GetAccountID")).Call(jen.Id("ag").Dot("ctx"))
+}
+
+func UseNSPredicate(name string) jen.Code {
+	return jen.Id(name).Dot(fmt.Sprintf("%sCol", strcase.ToCamel(TtKey))).Call().Dot("EQ").Call(UseGetTenantID())
+}
+
+func UseMByPredicate(name string) jen.Code {
+	return jen.Id(name).Dot(fmt.Sprintf("%sCol", strcase.ToCamel(MbKey))).Call().Dot("EQ").Call(UseGetAccountID())
 }
 
 func UseSensitivex(name string) jen.Code {

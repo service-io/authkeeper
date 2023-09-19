@@ -34,6 +34,8 @@ func (ag *autogen) RenderAuto() {
 	file.Add(ag.GenFuncLogicDelKey())
 	file.Add(ag.GenFuncEvaluator())
 	file.Add(ag.GenFuncTable())
+	file.Add(ag.GenFuncEnableDecorate())
+	file.Add(ag.GenFuncDisableDecorate())
 	file.Add(ag.GenFuncSelf())
 
 	helper.WriteToFile(file, fmt.Sprintf("%s/%s_autogen.go", ag.option.Package.Ety, ag.option.Table), false)
@@ -66,7 +68,7 @@ func (ag *autogen) GenStructEntity() jen.Code {
 		codes = append(codes, jen.Id(cn).Op("*").Add(jen.Id(ct)).Tag(tags))
 	}
 
-	codes = append(codes, jen.Line().Id("evaluator").Op("*").Add(helper.UseIrisEvaluator(ag.option.Entity)))
+	codes = append(codes, jen.Line().Id("evaluator").Op("*").Add(helper.UseCellarEvaluator(ag.option.Entity)), jen.Id("decorate").Bool())
 	return jen.Type().Id(ag.option.Entity).Struct(codes...)
 }
 
@@ -82,12 +84,17 @@ func (ag *autogen) GenFuncXCol() []jen.Code {
 		cn := strcase.ToCamel(col.ColumnName)
 		code := jen.Line().Comment(fmt.Sprintf("%sCol %s 列", cn, cn)).Line().Func().
 			Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id(fmt.Sprintf("%sCol", cn)).
-			Params().Op("*").Add(helper.UseIrisColumn(ag.option.Entity)).Block(
-			jen.Return(jen.Add(helper.UseIris("WithColumn")).
-				Call(jen.Lit(col.ColumnName),
+			Params().Op("*").Add(helper.UseCellarColumn(ag.option.Entity)).Block(
+			jen.Return(jen.Add(helper.UseCellar("WithColumn")).
+				Call(
+					jen.Lit(fmt.Sprintf("`%s`", col.ColumnName)),
 					jen.Func().Params(jen.Id("rec").Op("*").
 						Id(ag.option.Entity)).Params(jen.Any()).
-						Block(jen.Return(jen.Add(helper.RenderAndField("rec", cn)))))),
+						Block(jen.Return(jen.Add(helper.RenderAndField("rec", cn)))),
+					jen.Func().Params(jen.Id("key").String()).String().
+						Block(jen.If(jen.Op("!").Id("e").Dot("decorate")).Block(jen.Return(jen.Id("key"))),
+							jen.Return(jen.Lit(fmt.Sprintf("`%s`.", ag.option.Table)).Op("+").Id("key"))),
+				)),
 		)
 
 		codes[i] = code
@@ -97,9 +104,9 @@ func (ag *autogen) GenFuncXCol() []jen.Code {
 
 func (ag *autogen) GenFuncConfigure() jen.Code {
 	return jen.Line().Comment("Configure evaluator 配置").Line().
-		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("Configure").Params(jen.Id("fn").Func().Params(jen.Op("*").Add(helper.UseIrisEvaluator(ag.option.Entity)))).Block(
+		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("Configure").Params(jen.Id("fn").Func().Params(jen.Op("*").Add(helper.UseCellarEvaluator(ag.option.Entity)))).Block(
 		jen.If(jen.Id("e").Dot("evaluator").Op("==").Nil()).Block(
-			jen.Id("e").Dot("evaluator").Op("=").Add(helper.UseIris("WithLogicalEvaluator")).Types(jen.Id(ag.option.Entity)).Call(),
+			jen.Id("e").Dot("evaluator").Op("=").Add(helper.UseCellar("WithLogicalEvaluator")).Types(jen.Id(ag.option.Entity)).Call(),
 		),
 		jen.Id("fn").Call(jen.Id("e").Dot("evaluator")),
 	)
@@ -120,10 +127,10 @@ func (ag *autogen) GenFuncColumnAndValue() jen.Code {
 
 	return jen.Line().Comment("ColumnAndValue 列值计算").Line().
 		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("ColumnAndValue").
-		Params(jen.Id("fns").Op("...").Func().Params(jen.Op("*").Add(helper.UseIrisColumn(ag.option.Entity)), jen.Any()).Bool()).
-		Params(jen.Id("selfishs").Index().Add(helper.UseIris("Selfish")), jen.Id("values").Index().Any()).
+		Params(jen.Id("fns").Op("...").Func().Params(jen.Op("*").Add(helper.UseCellarColumn(ag.option.Entity)), jen.Any()).Bool()).
+		Params(jen.Id("selfishs").Index().Add(helper.UseCellar("Selfish")), jen.Id("values").Index().Any()).
 		Block(
-			jen.Id("fn").Op(":=").Func().Params(jen.Op("*").Add(helper.UseIrisColumn(ag.option.Entity)), jen.Any()).Params(jen.Bool()).Block(jen.Return(jen.True())),
+			jen.Id("fn").Op(":=").Func().Params(jen.Op("*").Add(helper.UseCellarColumn(ag.option.Entity)), jen.Any()).Params(jen.Bool()).Block(jen.Return(jen.True())),
 			jen.If(jen.Len(jen.Id("fns")).Op(">").Lit(0).Block(jen.Id("fn").Op("=").Id("fns").Index(jen.Lit(0)))),
 			jen.Add(codes...),
 			jen.Return(),
@@ -143,27 +150,27 @@ func (ag *autogen) GenFuncAsterisk() jen.Code {
 		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("Asterisk").
 		Params(jen.Id("fns").Op("...").Func().
 			Params(jen.String()).Params(jen.String())).
-		Params(jen.Index().Op("*").Add(helper.UseIrisColumn(ag.option.Entity))).
+		Params(jen.Index().Op("*").Add(helper.UseCellarColumn(ag.option.Entity))).
 		Block(
 			jen.Var().Id("fn").Func().Params(jen.String()).Params(jen.String()),
 			jen.If(jen.Len(jen.Id("fns")).Op(">").Lit(0)).Block(jen.Id("fn").Op("=").Id("fns").Index(jen.Lit(0))),
-			jen.Return(jen.Index().Op("*").Add(helper.UseIrisColumn(ag.option.Entity)).Values(codes...)),
+			jen.Return(jen.Index().Op("*").Add(helper.UseCellarColumn(ag.option.Entity)).Values(codes...)),
 		)
 }
 
 func (ag *autogen) GenFuncPKey() jen.Code {
 	return jen.Line().Comment("PKey 主键").Line().
-		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("PKey").Params().Params(jen.Op("*").Add(helper.UseIrisColumn(ag.option.Entity))).Block(jen.Return(jen.Id("e").Dot("IDCol").Call()))
+		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("PKey").Params().Params(jen.Op("*").Add(helper.UseCellarColumn(ag.option.Entity))).Block(jen.Return(jen.Id("e").Dot("IDCol").Call()))
 }
 
 func (ag *autogen) GenFuncLogicDelKey() jen.Code {
 	return jen.Line().Comment("LogicDelKey 逻辑删除").Line().
-		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("LogicDelKey").Params().Params(jen.Op("*").Add(helper.UseIrisColumn(ag.option.Entity))).Block(jen.Return(jen.Id("e").Dot("DeletedCol").Call()))
+		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("LogicDelKey").Params().Params(jen.Op("*").Add(helper.UseCellarColumn(ag.option.Entity))).Block(jen.Return(jen.Id("e").Dot("DeletedCol").Call()))
 }
 
 func (ag *autogen) GenFuncEvaluator() jen.Code {
 	return jen.Line().Comment("Evaluator 计算器").Line().
-		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("Evaluator").Params().Params(jen.Op("*").Add(helper.UseIris("Evaluator")).Types(jen.Id(ag.option.Entity))).
+		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("Evaluator").Params().Params(jen.Op("*").Add(helper.UseCellar("Evaluator")).Types(jen.Id(ag.option.Entity))).
 		Block(
 			jen.If(jen.Id("e").Op("==").Nil()).Block(jen.Return(jen.Nil())),
 			jen.Return(jen.Id("e").Dot("evaluator")),
@@ -172,8 +179,20 @@ func (ag *autogen) GenFuncEvaluator() jen.Code {
 
 func (ag *autogen) GenFuncTable() jen.Code {
 	return jen.Line().Comment("Table 表").Line().
-		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("Table").Params().Params(jen.Op("*").Add(helper.UseIrisRefTable())).
-		Block(jen.Return(jen.Add(helper.UseIris("WithTable")).Call(jen.Lit(ag.option.Table))))
+		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("Table").Params().Params(jen.Op("*").Add(helper.UseCellarRefTable())).
+		Block(jen.Return(jen.Add(helper.UseCellar("WithTable")).Call(jen.Lit(ag.option.Table))))
+}
+
+func (ag *autogen) GenFuncEnableDecorate() jen.Code {
+	return jen.Line().Comment("EnableDecorate 启用修饰符").Line().
+		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("EnableDecorate").Params().Params(jen.Op("*").Id(ag.option.Entity)).
+		Block(jen.Id("e").Dot("decorate").Op("=").True(), jen.Return(jen.Id("e")))
+}
+
+func (ag *autogen) GenFuncDisableDecorate() jen.Code {
+	return jen.Line().Comment("DisableDecorate 启用修饰符").Line().
+		Func().Params(jen.Id("e").Op("*").Id(ag.option.Entity)).Id("DisableDecorate").Params().Params(jen.Op("*").Id(ag.option.Entity)).
+		Block(jen.Id("e").Dot("decorate").Op("=").False(), jen.Return(jen.Id("e")))
 }
 
 func (ag *autogen) GenFuncSelf() jen.Code {
